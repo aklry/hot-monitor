@@ -4,12 +4,14 @@ import { ScheduleModule } from "@nestjs/schedule"
 import { configuration } from "./config/configuration"
 import { DatabaseModule } from "./database/database.module"
 import { HealthController } from "./health.controller"
+import { SourcesModule } from "./sources/sources.module"
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     DatabaseModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    SourcesModule
   ],
   controllers: [HealthController]
 })
