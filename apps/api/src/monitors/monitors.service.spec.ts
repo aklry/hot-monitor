@@ -1,8 +1,8 @@
-import type { KeywordAnalysis } from "@hots-monitor/shared"
+import type { ParsedKeywordAnalysis } from "@hots-monitor/shared"
 import { shouldNotifyKeywordHit, shouldNotifyRiskAlert } from "./monitor-thresholds"
 
 describe("monitor thresholds", () => {
-  const base: KeywordAnalysis = {
+  const base: ParsedKeywordAnalysis = {
     isRelevant: true,
     isImpersonation: false,
     confidence: 0.75,

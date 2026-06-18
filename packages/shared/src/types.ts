@@ -7,6 +7,7 @@ import type {
 } from "./schemas"
 
 export type KeywordAnalysis = z.infer<typeof KeywordAnalysisSchema>
+export type ParsedKeywordAnalysis = z.output<typeof KeywordAnalysisSchema>
 export type TrendAnalysis = z.infer<typeof TrendAnalysisSchema>
 export type CreateMonitorInput = z.infer<typeof CreateMonitorSchema>
 export type UpdateMonitorInput = z.infer<typeof UpdateMonitorSchema>

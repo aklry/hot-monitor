@@ -1,6 +1,6 @@
-import type { KeywordAnalysis } from "@hots-monitor/shared"
+import type { ParsedKeywordAnalysis } from "@hots-monitor/shared"
 
-export function shouldNotifyKeywordHit(analysis: KeywordAnalysis): boolean {
+export function shouldNotifyKeywordHit(analysis: ParsedKeywordAnalysis): boolean {
   return (
     analysis.isRelevant &&
     analysis.confidence >= 0.75 &&
@@ -8,6 +8,6 @@ export function shouldNotifyKeywordHit(analysis: KeywordAnalysis): boolean {
   )
 }
 
-export function shouldNotifyRiskAlert(analysis: KeywordAnalysis): boolean {
+export function shouldNotifyRiskAlert(analysis: ParsedKeywordAnalysis): boolean {
   return analysis.isImpersonation && analysis.confidence >= 0.8
 }

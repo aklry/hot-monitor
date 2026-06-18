@@ -5,6 +5,7 @@ dist/
 *.log
 apps/api/prisma/dev.db
 apps/api/prisma/dev.db-journal
+apps/api/src/generated/prisma/
 apps/api/coverage/
 apps/web/dist/
 apps/web/coverage/

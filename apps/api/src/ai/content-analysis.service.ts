@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common"
-import { KeywordAnalysisSchema, type KeywordAnalysis } from "@hots-monitor/shared"
+import { KeywordAnalysisSchema, type ParsedKeywordAnalysis } from "@hots-monitor/shared"
 import { parseAiJson } from "./ai-json-parser"
 import { DeepSeekClient } from "./deepseek.client"
 
@@ -16,7 +16,7 @@ export interface KeywordAnalysisInput {
 export class ContentAnalysisService {
   constructor(private readonly deepSeek: DeepSeekClient) {}
 
-  async analyzeKeyword(input: KeywordAnalysisInput): Promise<KeywordAnalysis> {
+  async analyzeKeyword(input: KeywordAnalysisInput): Promise<ParsedKeywordAnalysis> {
     const prompt = [
       "Analyze whether the item is truly related to the monitored keyword and scope.",
       "Detect impersonation, misleading naming, clickbait, or fake association.",

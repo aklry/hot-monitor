@@ -29,24 +29,26 @@ export class HackerNewsAdapter implements SourceAdapter {
     }
 
     const payload = (await response.json()) as HackerNewsResponse
-    return payload.hits
-      .map((hit) => {
-        const title = hit.title ?? hit.story_title
-        const itemUrl = hit.url ?? hit.story_url
-        if (!title || !itemUrl) {
-          return null
-        }
+    const items: CollectedCandidate[] = []
 
-        return {
-          sourceName: "Hacker News",
-          sourceType: this.type,
-          externalId: hit.objectID,
-          title,
-          url: itemUrl,
-          author: hit.author,
-          publishedAt: hit.created_at
-        } satisfies CollectedCandidate
+    for (const hit of payload.hits) {
+      const title = hit.title ?? hit.story_title
+      const itemUrl = hit.url ?? hit.story_url
+      if (!title || !itemUrl) {
+        continue
+      }
+
+      items.push({
+        sourceName: "Hacker News",
+        sourceType: this.type,
+        externalId: hit.objectID,
+        title,
+        url: itemUrl,
+        author: hit.author,
+        publishedAt: hit.created_at
       })
-      .filter((item): item is CollectedCandidate => item !== null)
+    }
+
+    return items
   }
 }

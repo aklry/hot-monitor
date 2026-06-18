@@ -1,6 +1,9 @@
-import type { ZodSchema } from "zod"
+import type { z, ZodTypeAny } from "zod"
 
-export function parseAiJson<T>(raw: string, schema: ZodSchema<T>): T {
+export function parseAiJson<TSchema extends ZodTypeAny>(
+  raw: string,
+  schema: TSchema
+): z.output<TSchema> {
   const trimmed = raw.trim()
   const withoutFence = trimmed
     .replace(/^```(?:json)?\s*/i, "")

@@ -1,4 +1,5 @@
 export const configuration = () => ({
+  DATABASE_URL: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
   API_PORT: process.env.API_PORT ?? "4000",
   WEB_ORIGIN: process.env.WEB_ORIGIN ?? "http://localhost:5173",
   DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY ?? "",
