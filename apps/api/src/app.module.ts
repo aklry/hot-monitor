@@ -6,6 +6,8 @@ import { configuration } from "./config/configuration"
 import { DatabaseModule } from "./database/database.module"
 import { HealthController } from "./health.controller"
 import { MonitorsModule } from "./monitors/monitors.module"
+import { NotificationsModule } from "./notifications/notifications.module"
+import { SettingsModule } from "./settings/settings.module"
 import { SourcesModule } from "./sources/sources.module"
 import { TrendsModule } from "./trends/trends.module"
 
@@ -15,7 +17,9 @@ import { TrendsModule } from "./trends/trends.module"
     AiModule,
     DatabaseModule,
     MonitorsModule,
+    NotificationsModule,
     ScheduleModule.forRoot(),
+    SettingsModule,
     SourcesModule,
     TrendsModule
   ],

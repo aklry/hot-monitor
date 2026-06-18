@@ -1,5 +1,7 @@
 import { Injectable } from "@nestjs/common"
+import { Subject } from "rxjs"
 import { PrismaService } from "../database/prisma.service"
+import { MailerService } from "./mailer.service"
 
 export interface CreateNotificationInput {
   type: string
@@ -14,10 +16,15 @@ export interface CreateNotificationInput {
 
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly stream = new Subject<MessageEvent>()
 
-  create(input: CreateNotificationInput) {
-    return this.prisma.notification.create({
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailer: MailerService
+  ) {}
+
+  async create(input: CreateNotificationInput) {
+    const notification = await this.prisma.notification.create({
       data: {
         type: input.type,
         title: input.title,
@@ -29,5 +36,49 @@ export class NotificationsService {
         relatedTrendId: input.relatedTrendId
       }
     })
+    this.stream.next({ data: notification } as MessageEvent)
+    return notification
+  }
+
+  list() {
+    return this.prisma.notification.findMany({ orderBy: { createdAt: "desc" }, take: 100 })
+  }
+
+  async markRead(id: string) {
+    return this.prisma.notification.update({
+      where: { id },
+      data: { status: "read" }
+    })
+  }
+
+  streamEvents() {
+    return this.stream.asObservable()
+  }
+
+  async retry(id: string) {
+    const notification = await this.prisma.notification.findUniqueOrThrow({ where: { id } })
+    if (notification.channel !== "email") {
+      return this.prisma.notification.update({
+        where: { id },
+        data: { status: "pending", error: null }
+      })
+    }
+
+    try {
+      await this.mailer.send({
+        to: notification.target,
+        subject: notification.title,
+        text: notification.message
+      })
+      return this.prisma.notification.update({
+        where: { id },
+        data: { status: "sent", sentAt: new Date(), error: null }
+      })
+    } catch (error) {
+      return this.prisma.notification.update({
+        where: { id },
+        data: { status: "failed", error: (error as Error).message }
+      })
+    }
   }
 }
