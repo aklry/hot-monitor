@@ -7,6 +7,7 @@ import { DatabaseModule } from "./database/database.module"
 import { HealthController } from "./health.controller"
 import { MonitorsModule } from "./monitors/monitors.module"
 import { SourcesModule } from "./sources/sources.module"
+import { TrendsModule } from "./trends/trends.module"
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { SourcesModule } from "./sources/sources.module"
     DatabaseModule,
     MonitorsModule,
     ScheduleModule.forRoot(),
-    SourcesModule
+    SourcesModule,
+    TrendsModule
   ],
   controllers: [HealthController]
 })
