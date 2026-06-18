@@ -1,0 +1,410 @@
+:root {
+  color: #e9f1ee;
+  background: #0b0f10;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    linear-gradient(90deg, rgba(35, 52, 50, 0.32) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(35, 52, 50, 0.22) 1px, transparent 1px),
+    #0b0f10;
+  background-size: 42px 42px;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  border: 1px solid #34413e;
+  background: #121918;
+  color: #dce7e3;
+  border-radius: 6px;
+  padding: 0.62rem 0.8rem;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: #65d6b5;
+}
+
+input {
+  width: 100%;
+  border: 1px solid #2d3b38;
+  background: #09100f;
+  color: #f3fbf8;
+  border-radius: 6px;
+  padding: 0.7rem 0.75rem;
+}
+
+label {
+  color: #93aaa4;
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.84rem;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+}
+
+.side-nav {
+  border-right: 1px solid #20302d;
+  background: rgba(9, 15, 14, 0.94);
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  height: 52px;
+  color: #f2fffb;
+  font-weight: 700;
+}
+
+.side-nav nav {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1.5rem;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  text-align: left;
+  color: #a9bbb6;
+}
+
+.nav-button.active {
+  background: #163129;
+  border-color: #65d6b5;
+  color: #f6fffc;
+}
+
+.workspace {
+  padding: 1.1rem;
+  min-width: 0;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 76px;
+  border-bottom: 1px solid #20302d;
+  margin-bottom: 1.1rem;
+}
+
+.top-bar h1 {
+  margin: 0;
+  font-size: clamp(1.4rem, 2vw, 2rem);
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  color: #72c7ad;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+.icon-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.console-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 1rem;
+}
+
+.metric-strip {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.metric,
+.panel,
+.record-row,
+.trend-card {
+  border: 1px solid #22332f;
+  background: rgba(12, 20, 19, 0.88);
+  border-radius: 8px;
+}
+
+.metric {
+  padding: 1rem;
+  min-height: 96px;
+}
+
+.metric span,
+small,
+.muted {
+  color: #8ba09a;
+}
+
+.metric strong {
+  display: block;
+  font-size: 2rem;
+  margin-top: 0.35rem;
+}
+
+.metric.risk strong,
+.pulse.risk,
+.notice.error {
+  color: #ff8d7d;
+}
+
+.panel {
+  padding: 1rem;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.panel-header h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.timeline {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.timeline-item,
+.source-row,
+.trend-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.timeline-item p,
+.trend-row p,
+.record-row p,
+.trend-card p {
+  margin: 0.25rem 0;
+  color: #b8cac5;
+}
+
+.pulse,
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #65d6b5;
+  margin-top: 0.35rem;
+}
+
+.dot {
+  background: #4b5b57;
+}
+
+.dot.online {
+  background: #65d6b5;
+}
+
+.source-row {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid #1d2b28;
+}
+
+.trend-band {
+  grid-column: 1 / -1;
+}
+
+.trend-list,
+.trend-cards,
+.list-panel,
+.stack {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.trend-row {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #1d2b28;
+}
+
+.score {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #65d6b5;
+  color: #65d6b5;
+  border-radius: 50%;
+  font-weight: 800;
+}
+
+.score.large {
+  width: 58px;
+  height: 58px;
+  font-size: 1.2rem;
+}
+
+.form-grid,
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.settings-grid {
+  align-items: end;
+}
+
+.field,
+.settings-actions {
+  border: 1px solid #22332f;
+  background: rgba(12, 20, 19, 0.88);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.primary {
+  background: #65d6b5;
+  color: #06110f;
+  border-color: #65d6b5;
+  font-weight: 800;
+}
+
+.record-row,
+.trend-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.trend-card {
+  justify-content: flex-start;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.notice {
+  border: 1px solid #3b6b60;
+  background: rgba(21, 48, 42, 0.72);
+  color: #dffbf3;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+}
+
+@media (max-width: 960px) {
+  .app-shell {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+
+  .brand-mark span,
+  .nav-button span {
+    display: none;
+  }
+
+  .console-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-strip,
+  .form-grid,
+  .settings-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    display: block;
+    padding-bottom: 72px;
+  }
+
+  .side-nav {
+    position: fixed;
+    z-index: 10;
+    inset: auto 0 0;
+    height: 66px;
+    border-top: 1px solid #20302d;
+    border-right: 0;
+    padding: 0.4rem;
+  }
+
+  .brand-mark {
+    display: none;
+  }
+
+  .side-nav nav {
+    grid-template-columns: repeat(6, 1fr);
+    margin: 0;
+    gap: 0.3rem;
+  }
+
+  .nav-button {
+    justify-content: center;
+    padding: 0.75rem 0.25rem;
+  }
+
+  .workspace {
+    padding: 0.85rem;
+  }
+
+  .top-bar {
+    align-items: flex-start;
+  }
+
+  .metric-strip,
+  .form-grid,
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .record-row {
+    display: grid;
+  }
+
+  .row-actions {
+    justify-content: flex-start;
+  }
+}
