@@ -16,6 +16,7 @@ import { NotificationsPage } from "./pages/NotificationsPage"
 import { SettingsPage } from "./pages/SettingsPage"
 import { SourcesPage } from "./pages/SourcesPage"
 import { TrendsPage } from "./pages/TrendsPage"
+import { requestBrowserNotificationPermission } from "./utils/browser-notifications"
 
 type Page = "dashboard" | "monitors" | "trends" | "sources" | "notifications" | "settings"
 
@@ -34,9 +35,13 @@ export function App() {
 
   useEffect(() => {
     const stream = notificationStream()
+    if (!stream) {
+      return
+    }
+
     stream.onmessage = (event) => {
       setSignalCount((count) => count + 1)
-      if (Notification.permission === "granted") {
+      if (typeof Notification !== "undefined" && Notification.permission === "granted") {
         const payload = JSON.parse(event.data)
         new Notification(payload.title, { body: payload.message })
       }
@@ -82,7 +87,7 @@ export function App() {
           </div>
           <button
             className="icon-action"
-            onClick={() => Notification.requestPermission()}
+            onClick={requestBrowserNotificationPermission}
             title="Enable browser notifications"
           >
             <Zap size={18} />

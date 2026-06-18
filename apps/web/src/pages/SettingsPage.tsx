@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from "react"
 import { apiGet, apiPatch, apiPost } from "../api/client"
+import { requestBrowserNotificationPermission } from "../utils/browser-notifications"
 
 export function SettingsPage() {
   const [settings, setSettings] = useState<Record<string, string>>({})
@@ -39,7 +40,7 @@ export function SettingsPage() {
         <button type="button" onClick={async () => setMessage(JSON.stringify(await apiPost("/settings/test-email")))}>
           Test Email
         </button>
-        <button type="button" onClick={() => Notification.requestPermission()}>
+        <button type="button" onClick={requestBrowserNotificationPermission}>
           Browser Permission
         </button>
       </div>

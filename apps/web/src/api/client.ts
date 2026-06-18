@@ -29,6 +29,10 @@ export async function apiDelete<T>(path: string): Promise<T> {
 }
 
 export function notificationStream() {
+  if (typeof EventSource === "undefined") {
+    return null
+  }
+
   return new EventSource(`${API_BASE}/notifications/stream`)
 }
 
