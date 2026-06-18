@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  encrypted Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+}
+
+model MonitorKeyword {
+  id                   String       @id @default(cuid())
+  keyword              String
+  scope                String
+  enabled              Boolean      @default(true)
+  checkIntervalMinutes Int          @default(10)
+  lastCheckedAt        DateTime?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  analyses             AiAnalysis[]
+
+  @@index([enabled])
+  @@index([scope])
+}
+
+model Source {
+  id            String          @id @default(cuid())
+  name          String
+  type          String
+  url           String?
+  enabled       Boolean         @default(true)
+  weight        Int             @default(50)
+  lastFetchedAt DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  items         CollectedItem[]
+
+  @@unique([type, url])
+  @@index([enabled])
+}
+
+model CollectedItem {
+  id          String          @id @default(cuid())
+  sourceId    String
+  source      Source          @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  externalId  String?
+  title       String
+  url         String
+  author      String?
+  summary     String?
+  content     String?
+  publishedAt DateTime?
+  fetchedAt   DateTime        @default(now())
+  hash        String          @unique
+  analyses    AiAnalysis[]
+  evidences   TrendEvidence[]
+  notifications Notification[]
+
+  @@index([url])
+  @@index([publishedAt])
+}
+
+model AiAnalysis {
+  id              String          @id @default(cuid())
+  itemId          String
+  item            CollectedItem   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  keywordId       String?
+  keyword         MonitorKeyword? @relation(fields: [keywordId], references: [id], onDelete: SetNull)
+  taskType        String
+  model           String
+  isRelevant      Boolean         @default(false)
+  isImpersonation Boolean         @default(false)
+  confidence      Float           @default(0)
+  hotScore        Float?
+  riskLevel       String          @default("low")
+  topic           String?
+  reason          String
+  rawJson         String
+  createdAt       DateTime        @default(now())
+
+  @@index([taskType])
+  @@index([keywordId])
+  @@index([itemId])
+}
+
+model TrendTopic {
+  id            String          @id @default(cuid())
+  scope         String
+  title         String
+  summary       String
+  hotScore      Float
+  growthScore   Float
+  evidenceCount Int             @default(0)
+  firstSeenAt   DateTime
+  lastSeenAt    DateTime
+  createdAt     DateTime        @default(now())
+  evidences     TrendEvidence[]
+  notifications Notification[]
+
+  @@index([scope])
+  @@index([hotScore])
+  @@index([lastSeenAt])
+}
+
+model TrendEvidence {
+  id           String        @id @default(cuid())
+  trendTopicId String
+  trendTopic   TrendTopic    @relation(fields: [trendTopicId], references: [id], onDelete: Cascade)
+  itemId       String
+  item         CollectedItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  sourceWeight Int
+  aiReason     String
+
+  @@unique([trendTopicId, itemId])
+}
+
+model Notification {
+  id             String         @id @default(cuid())
+  type           String
+  title          String
+  message        String
+  channel        String
+  status         String         @default("pending")
+  target         String?
+  relatedItemId  String?
+  relatedItem    CollectedItem? @relation(fields: [relatedItemId], references: [id], onDelete: SetNull)
+  relatedTrendId String?
+  relatedTrend   TrendTopic?    @relation(fields: [relatedTrendId], references: [id], onDelete: SetNull)
+  createdAt      DateTime       @default(now())
+  sentAt         DateTime?
+  error          String?
+
+  @@index([channel])
+  @@index([status])
+  @@index([createdAt])
+}
