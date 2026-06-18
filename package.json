@@ -1,0 +1,20 @@
+{
+  "name": "hots-monitor",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @hots-monitor/api --filter @hots-monitor/web dev",
+    "dev:api": "pnpm --filter @hots-monitor/api dev",
+    "dev:web": "pnpm --filter @hots-monitor/web dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "prisma:generate": "pnpm --filter @hots-monitor/api prisma:generate",
+    "prisma:migrate": "pnpm --filter @hots-monitor/api prisma:migrate"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

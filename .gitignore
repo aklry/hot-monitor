@@ -1,1 +1,10 @@
 docs/superpowers/
+node_modules/
+dist/
+.env
+*.log
+apps/api/prisma/dev.db
+apps/api/prisma/dev.db-journal
+apps/api/coverage/
+apps/web/dist/
+apps/web/coverage/
