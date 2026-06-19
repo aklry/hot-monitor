@@ -1,4 +1,5 @@
 import { Injectable, OnModuleInit } from "@nestjs/common"
+import { ConfigService } from "@nestjs/config"
 import { PrismaService } from "../database/prisma.service"
 
 const DEFAULT_SOURCES = [
@@ -13,6 +14,12 @@ const DEFAULT_SOURCES = [
     type: "github_trending",
     url: "builtin:github-trending",
     weight: 85
+  },
+  {
+    name: "X Recent Search",
+    type: "x",
+    url: "builtin:x-recent-search",
+    weight: 75
   },
   {
     name: "OpenAI News",
@@ -34,12 +41,28 @@ const DEFAULT_SOURCES = [
   }
 ]
 
+const RSSHUB_SOURCES = [
+  {
+    name: "Weibo Hot Search",
+    path: "/weibo/search/hot",
+    weight: 70
+  },
+  {
+    name: "Zhihu Hotlist",
+    path: "/zhihu/hotlist",
+    weight: 70
+  }
+]
+
 @Injectable()
 export class SourceSeedService implements OnModuleInit {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService
+  ) {}
 
   async onModuleInit() {
-    for (const source of DEFAULT_SOURCES) {
+    for (const source of [...DEFAULT_SOURCES, ...this.rssHubSources()]) {
       await this.prisma.source.upsert({
         where: {
           type_url: {
@@ -56,5 +79,17 @@ export class SourceSeedService implements OnModuleInit {
         }
       })
     }
+  }
+
+  private rssHubSources() {
+    const baseUrl = this.config.get<string>("RSSHUB_BASE_URL") ?? "https://rsshub.app"
+    const normalizedBaseUrl = baseUrl.replace(/\/+$/, "")
+
+    return RSSHUB_SOURCES.map((source) => ({
+      name: source.name,
+      type: "rss",
+      url: `${normalizedBaseUrl}${source.path}`,
+      weight: source.weight
+    }))
   }
 }

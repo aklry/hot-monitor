@@ -1,4 +1,5 @@
-import { Injectable } from "@nestjs/common"
+import { BadRequestException, Injectable } from "@nestjs/common"
+import { ConfigService } from "@nestjs/config"
 import type { CollectedCandidate } from "@hots-monitor/shared"
 import { PrismaService } from "../database/prisma.service"
 import { GithubTrendingAdapter } from "./github-trending.adapter"
@@ -6,10 +7,14 @@ import { HackerNewsAdapter } from "./hacker-news.adapter"
 import { RssAdapter } from "./rss.adapter"
 import type { SourceAdapter } from "./source-adapter"
 import { dedupeCandidates } from "./source-normalizer"
+import { XAdapter } from "./x.adapter"
 
 @Injectable()
 export class SourcesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService
+  ) {}
 
   async listSources() {
     return this.prisma.source.findMany({ orderBy: { createdAt: "asc" } })
@@ -33,8 +38,13 @@ export class SourcesService {
   async testSource(id: string, query = "ai") {
     const source = await this.prisma.source.findUniqueOrThrow({ where: { id } })
     const adapter = this.adapterForSource(source)
-    const items = await adapter.search(query)
-    return { count: items.length, items: dedupeCandidates(items).slice(0, 10) }
+
+    try {
+      const items = await adapter.search(query)
+      return { count: items.length, items: dedupeCandidates(items).slice(0, 10) }
+    } catch (error) {
+      throw new BadRequestException(this.sourceTestErrorMessage(source, error as Error))
+    }
   }
 
   async searchAll(query: string): Promise<CollectedCandidate[]> {
@@ -43,6 +53,17 @@ export class SourcesService {
     const settled = await Promise.allSettled(adapters.map((adapter) => adapter.search(query)))
     const items = settled.flatMap((result) => (result.status === "fulfilled" ? result.value : []))
     return dedupeCandidates(items)
+  }
+
+  private sourceTestErrorMessage(source: { name: string; type: string }, error: Error) {
+    if (source.type === "rss") {
+      return (
+        `Source test failed for ${source.name}: the URL did not return a valid RSS/Atom feed. ` +
+        `Use a feed XML URL instead of a normal webpage. Original error: ${error.message}`
+      )
+    }
+
+    return `Source test failed for ${source.name}: ${error.message}`
   }
 
   private adapterForSource(source: { name: string; type: string; url: string | null }): SourceAdapter {
@@ -54,6 +75,9 @@ export class SourcesService {
     }
     if (source.type === "github_trending") {
       return new GithubTrendingAdapter()
+    }
+    if (source.type === "x") {
+      return new XAdapter(this.config.get<string>("X_BEARER_TOKEN") ?? "")
     }
     throw new Error(`Unsupported source type: ${source.type}`)
   }
