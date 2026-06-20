@@ -5,10 +5,16 @@ export const UrgencySchema = z.enum(["low", "medium", "high"])
 export const NotificationChannelSchema = z.enum(["in_app", "browser", "email"])
 export const NotificationStatusSchema = z.enum(["pending", "sent", "failed", "read"])
 
+const aiNumber = (schema: z.ZodNumber) =>
+  z.preprocess(
+    (value) => (typeof value === "string" && value.trim() !== "" ? Number(value) : value),
+    schema
+  )
+
 export const KeywordAnalysisSchema = z.object({
   isRelevant: z.boolean(),
   isImpersonation: z.boolean(),
-  confidence: z.number().min(0).max(1),
+  confidence: aiNumber(z.number().min(0).max(1)),
   riskLevel: RiskLevelSchema,
   urgency: UrgencySchema,
   topic: z.string().min(1),
