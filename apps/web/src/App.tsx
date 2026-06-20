@@ -10,6 +10,7 @@ import {
   Zap
 } from "lucide-react"
 import { notificationStream } from "./api/client"
+import type { NotificationRecord } from "./types"
 import { DashboardPage } from "./pages/DashboardPage"
 import { MonitorsPage } from "./pages/MonitorsPage"
 import { NotificationsPage } from "./pages/NotificationsPage"
@@ -40,10 +41,23 @@ export function App() {
     }
 
     stream.onmessage = (event) => {
+      const payload = JSON.parse(event.data) as NotificationRecord
       setSignalCount((count) => count + 1)
-      if (typeof Notification !== "undefined" && Notification.permission === "granted") {
-        const payload = JSON.parse(event.data)
-        new Notification(payload.title, { body: payload.message })
+      if (
+        payload.channel === "browser" &&
+        typeof Notification !== "undefined" &&
+        Notification.permission === "granted"
+      ) {
+        const item = payload.relatedItem
+        const notification = new Notification(item?.title ?? payload.title, {
+          body: formatNotificationBody(payload)
+        })
+
+        notification.onclick = () => {
+          if (item?.url) {
+            window.open(item.url, "_blank", "noopener,noreferrer")
+          }
+        }
       }
     }
     return () => stream.close()
@@ -104,4 +118,19 @@ export function App() {
       </main>
     </div>
   )
+}
+
+function formatNotificationBody(notification: NotificationRecord) {
+  const item = notification.relatedItem
+  const text = item?.summary || item?.content || notification.message
+  return truncateNotificationText(text)
+}
+
+function truncateNotificationText(text: string, maxLength = 240) {
+  const normalized = text.replace(/\s+/g, " ").trim()
+  if (normalized.length <= maxLength) {
+    return normalized
+  }
+
+  return `${normalized.slice(0, maxLength - 1)}...`
 }

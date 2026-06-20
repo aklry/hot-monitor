@@ -24,7 +24,10 @@ export class DashboardService {
         }),
         this.prisma.notification.findMany({
           orderBy: { createdAt: "desc" },
-          take: 10
+          take: 10,
+          include: {
+            relatedItem: true
+          }
         }),
         this.prisma.source.findMany({
           orderBy: { name: "asc" }

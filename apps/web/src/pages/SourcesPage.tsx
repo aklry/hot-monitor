@@ -47,10 +47,14 @@ export function SourcesPage() {
             <div className="row-actions">
               <button
                 onClick={async () => {
-                  const result = await apiPost<{ count: number }>(`/sources/${source.id}/test`, {
-                    query: "ai"
-                  })
-                  setMessage(`${source.name}: ${result.count} sample items`)
+                  try {
+                    const result = await apiPost<{ count: number }>(`/sources/${source.id}/test`, {
+                      query: "ai"
+                    })
+                    setMessage(`${source.name}: ${result.count} sample items`)
+                  } catch (error) {
+                    setMessage(`${source.name}: ${(error as Error).message}`)
+                  }
                 }}
               >
                 Test

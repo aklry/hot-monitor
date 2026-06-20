@@ -34,6 +34,9 @@ export class NotificationsService {
         target: input.target,
         relatedItemId: input.relatedItemId,
         relatedTrendId: input.relatedTrendId
+      },
+      include: {
+        relatedItem: true
       }
     })
     this.stream.next({ data: notification } as MessageEvent)
@@ -41,7 +44,13 @@ export class NotificationsService {
   }
 
   list() {
-    return this.prisma.notification.findMany({ orderBy: { createdAt: "desc" }, take: 100 })
+    return this.prisma.notification.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 100,
+      include: {
+        relatedItem: true
+      }
+    })
   }
 
   async markRead(id: string) {

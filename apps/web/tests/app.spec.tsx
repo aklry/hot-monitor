@@ -6,7 +6,8 @@ describe("App", () => {
     render(<App />)
 
     expect(screen.getByText("Hots Monitor")).toBeInTheDocument()
-    expect(screen.getByText("Signal")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Signal" })).toBeInTheDocument()
     expect(screen.getByText("Monitors")).toBeInTheDocument()
   })
 })
+

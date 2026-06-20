@@ -218,6 +218,22 @@ small,
   color: #b8cac5;
 }
 
+.article-link {
+  display: inline-block;
+  margin-top: 0.35rem;
+  color: #8fe7cf;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.article-link:hover {
+  text-decoration: underline;
+}
+
+.article-summary {
+  max-width: 70ch;
+}
+
 .pulse,
 .dot {
   width: 10px;
@@ -408,3 +424,4 @@ small,
     justify-content: flex-start;
   }
 }
+

@@ -34,6 +34,11 @@ export function DashboardPage() {
               <div>
                 <strong>{item.title}</strong>
                 <p>{item.message}</p>
+                {item.relatedItem && (
+                  <a className="article-link" href={item.relatedItem.url} target="_blank" rel="noreferrer">
+                    {item.relatedItem.title}
+                  </a>
+                )}
                 <small>
                   {item.channel} / {item.status}
                 </small>
@@ -91,3 +96,4 @@ function Metric({ label, value, tone }: { label: string; value: number; tone?: "
     </div>
   )
 }
+

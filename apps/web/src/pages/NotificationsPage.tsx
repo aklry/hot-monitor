@@ -17,6 +17,12 @@ export function NotificationsPage() {
           <div>
             <strong>{item.title}</strong>
             <p>{item.message}</p>
+            {item.relatedItem && (
+              <a className="article-link" href={item.relatedItem.url} target="_blank" rel="noreferrer">
+                {item.relatedItem.title}
+              </a>
+            )}
+            {item.relatedItem?.summary && <p className="article-summary">{item.relatedItem.summary}</p>}
             <small>
               {item.channel} / {item.status}
               {item.error ? ` / ${item.error}` : ""}
@@ -47,3 +53,4 @@ export function NotificationsPage() {
     </section>
   )
 }
+

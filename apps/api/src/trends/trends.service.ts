@@ -3,6 +3,7 @@ import { TrendAnalysisService } from "../ai/trend-analysis.service"
 import { PrismaService } from "../database/prisma.service"
 import { SourcesService } from "../sources/sources.service"
 import { candidateHash } from "../sources/source-normalizer"
+import { filterCurrentTrendCandidates } from "./trend-recency"
 import { calculateTrendScore } from "./trend-score"
 
 @Injectable()
@@ -38,9 +39,15 @@ export class TrendsService {
 
   async runNow(scope: string) {
     const candidates = await this.sources.searchAll(scope)
-    const limited = candidates.slice(0, 30)
-    const analysis = await this.trendAnalysis.analyzeTrend(scope, limited)
     const now = new Date()
+    const current = filterCurrentTrendCandidates(candidates, now)
+    const limited = current.candidates.slice(0, 30)
+
+    if (current.recentDatedCount === 0 || limited.length === 0) {
+      return { trend: null, candidates: candidates.length, evidence: 0 }
+    }
+
+    const analysis = await this.trendAnalysis.analyzeTrend(scope, limited, now)
 
     const items = []
     for (const candidate of limited) {

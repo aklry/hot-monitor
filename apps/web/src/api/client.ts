@@ -39,7 +39,30 @@ export function notificationStream() {
 async function readResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const text = await response.text()
-    throw new Error(text || `HTTP ${response.status}`)
+    throw new Error(readErrorMessage(text) || `HTTP ${response.status}`)
   }
   return (await response.json()) as T
+}
+
+function readErrorMessage(text: string): string {
+  if (!text) {
+    return ""
+  }
+
+  try {
+    const parsed = JSON.parse(text) as { message?: unknown; error?: unknown }
+    if (typeof parsed.message === "string") {
+      return parsed.message
+    }
+    if (Array.isArray(parsed.message)) {
+      return parsed.message.join("; ")
+    }
+    if (typeof parsed.error === "string") {
+      return parsed.error
+    }
+  } catch {
+    return text
+  }
+
+  return text
 }

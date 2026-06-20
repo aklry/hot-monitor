@@ -36,6 +36,16 @@ export interface SourceRecord {
   weight: number
 }
 
+export interface NotificationItem {
+  id: string
+  title: string
+  url: string
+  summary?: string
+  content?: string
+  author?: string
+  publishedAt?: string
+}
+
 export interface NotificationRecord {
   id: string
   type: string
@@ -45,4 +55,5 @@ export interface NotificationRecord {
   status: string
   createdAt: string
   error?: string
+  relatedItem?: NotificationItem | null
 }

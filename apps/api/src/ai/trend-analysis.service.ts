@@ -37,7 +37,7 @@ function createTrendAnalysisResponseSchema(items: CollectedCandidate[]) {
 export class TrendAnalysisService {
   constructor(private readonly deepSeek: DeepSeekClient) {}
 
-  async analyzeTrend(scope: string, items: CollectedCandidate[]): Promise<TrendAnalysis> {
+  async analyzeTrend(scope: string, items: CollectedCandidate[], now = new Date()): Promise<TrendAnalysis> {
     const evidence = items
       .slice(0, 20)
       .map((item, index) => `${index + 1}. ${item.title}\nURL: ${item.url}\nSummary: ${item.summary ?? ""}`)
@@ -46,6 +46,9 @@ export class TrendAnalysisService {
     const prompt = [
       "Extract the strongest trend topic from these multi-source items.",
       "Return JSON with: title, summary, hotScore, growthScore, evidence, whyNow.",
+      `Current date: ${now.toISOString().slice(0, 10)}.`,
+      "Only identify trends supported by candidate items from the last 30 days.",
+      "Do not use model memory or older background knowledge as evidence.",
       'The evidence field must be an array of objects like {"itemUrl":"https://...","reason":"..."}.',
       `Scope: ${scope}`,
       "",
