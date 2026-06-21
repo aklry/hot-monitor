@@ -91,8 +91,17 @@ label {
   align-items: center;
   gap: 0.7rem;
   width: 100%;
+  border: 1px solid #34413e;
+  background: #121918;
+  border-radius: 6px;
+  padding: 0.62rem 0.8rem;
   text-align: left;
   color: #a9bbb6;
+  text-decoration: none;
+}
+
+.nav-button:hover {
+  border-color: #65d6b5;
 }
 
 .nav-button.active {

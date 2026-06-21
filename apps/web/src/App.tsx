@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
+import { Navigate, NavLink, Route, Routes, useLocation } from "react-router"
 import {
   Bell,
   Database,
@@ -21,18 +22,18 @@ import { requestBrowserNotificationPermission } from "./utils/browser-notificati
 
 type Page = "dashboard" | "monitors" | "trends" | "sources" | "notifications" | "settings"
 
-const navItems: Array<{ page: Page; label: string; icon: typeof Gauge }> = [
-  { page: "dashboard", label: "Signal", icon: Gauge },
-  { page: "monitors", label: "Monitors", icon: Search },
-  { page: "trends", label: "Radar", icon: Radar },
-  { page: "sources", label: "Sources", icon: Database },
-  { page: "notifications", label: "Alerts", icon: Bell },
-  { page: "settings", label: "Settings", icon: Settings }
+const navItems: Array<{ page: Page; path: string; label: string; icon: typeof Gauge }> = [
+  { page: "dashboard", path: "/", label: "Signal", icon: Gauge },
+  { page: "monitors", path: "/monitors", label: "Monitors", icon: Search },
+  { page: "trends", path: "/trends", label: "Radar", icon: Radar },
+  { page: "sources", path: "/sources", label: "Sources", icon: Database },
+  { page: "notifications", path: "/notifications", label: "Alerts", icon: Bell },
+  { page: "settings", path: "/settings", label: "Settings", icon: Settings }
 ]
 
 export function App() {
-  const [page, setPage] = useState<Page>("dashboard")
   const [signalCount, setSignalCount] = useState(0)
+  const location = useLocation()
 
   useEffect(() => {
     const stream = notificationStream()
@@ -63,10 +64,7 @@ export function App() {
     return () => stream.close()
   }, [])
 
-  const currentTitle = useMemo(
-    () => navItems.find((item) => item.page === page)?.label ?? "Signal",
-    [page]
-  )
+  const currentTitle = navItems.find((item) => item.path === location.pathname)?.label ?? "Signal"
 
   return (
     <div className="app-shell">
@@ -79,15 +77,16 @@ export function App() {
           {navItems.map((item) => {
             const Icon = item.icon
             return (
-              <button
+              <NavLink
                 key={item.page}
-                className={page === item.page ? "nav-button active" : "nav-button"}
-                onClick={() => setPage(item.page)}
+                to={item.path}
+                end={item.path === "/"}
+                className={({ isActive }) => (isActive ? "nav-button active" : "nav-button")}
                 title={item.label}
               >
                 <Icon size={18} />
                 <span>{item.label}</span>
-              </button>
+              </NavLink>
             )
           })}
         </nav>
@@ -109,12 +108,15 @@ export function App() {
           </button>
         </header>
 
-        {page === "dashboard" && <DashboardPage />}
-        {page === "monitors" && <MonitorsPage />}
-        {page === "trends" && <TrendsPage />}
-        {page === "sources" && <SourcesPage />}
-        {page === "notifications" && <NotificationsPage />}
-        {page === "settings" && <SettingsPage />}
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/monitors" element={<MonitorsPage />} />
+          <Route path="/trends" element={<TrendsPage />} />
+          <Route path="/sources" element={<SourcesPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
     </div>
   )
