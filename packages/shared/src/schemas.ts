@@ -1,20 +1,43 @@
 import { z } from "zod"
 
-export const RiskLevelSchema = z.enum(["low", "medium", "high"])
+const aiRiskLevel = z.preprocess((value) => {
+  if (typeof value !== "string") {
+    return value
+  }
+
+  const normalized = value.trim().toLowerCase()
+  return ["", "none", "no", "n/a", "na", "null"].includes(normalized) ? "low" : normalized
+}, z.enum(["low", "medium", "high"]))
+
+export const RiskLevelSchema = aiRiskLevel
 export const UrgencySchema = z.enum(["low", "medium", "high"])
 export const NotificationChannelSchema = z.enum(["in_app", "browser", "email"])
 export const NotificationStatusSchema = z.enum(["pending", "sent", "failed", "read"])
 
-const aiNumber = (schema: z.ZodNumber) =>
-  z.preprocess(
-    (value) => (typeof value === "string" && value.trim() !== "" ? Number(value) : value),
-    schema
-  )
+const aiNumber = (schema: z.ZodNumber, fallback: number) =>
+  z.preprocess((value) => {
+    if (typeof value === "number") {
+      return Number.isFinite(value) ? value : fallback
+    }
+
+    if (typeof value !== "string") {
+      return value
+    }
+
+    const normalized = value.trim().toLowerCase()
+    if (["", "none", "no", "n/a", "na", "null", "nan", "unknown"].includes(normalized)) {
+      return fallback
+    }
+
+    const percentage = normalized.match(/^(\d+(?:\.\d+)?)%$/)
+    const parsed = percentage ? Number(percentage[1]) / 100 : Number(normalized)
+    return Number.isFinite(parsed) ? parsed : fallback
+  }, schema)
 
 export const KeywordAnalysisSchema = z.object({
   isRelevant: z.boolean(),
   isImpersonation: z.boolean(),
-  confidence: aiNumber(z.number().min(0).max(1)),
+  confidence: aiNumber(z.number().min(0).max(1), 0),
   riskLevel: RiskLevelSchema,
   urgency: UrgencySchema,
   topic: z.string().min(1),

@@ -21,6 +21,8 @@ export class ContentAnalysisService {
       "Analyze whether the item is truly related to the monitored keyword and scope.",
       "Detect impersonation, misleading naming, clickbait, or fake association.",
       "Return JSON with: isRelevant, isImpersonation, confidence, riskLevel, urgency, topic, reason, matchedSignals.",
+      "riskLevel and urgency must be one of: low, medium, high. Use low when there is no meaningful risk or urgency.",
+      "confidence must be a number from 0 to 1. Use 0 when confidence cannot be determined.",
       "",
       `Keyword: ${input.keyword}`,
       `Scope: ${input.scope}`,
