@@ -27,6 +27,28 @@ export interface TrendTopic {
   lastSeenAt: string
 }
 
+export interface TrendDetail extends TrendTopic {
+  firstSeenAt: string
+  evidences: TrendEvidence[]
+}
+
+export interface TrendEvidence {
+  id: string
+  aiReason?: string | null
+  sourceWeight: number
+  item: TrendEvidenceItem
+}
+
+export interface TrendEvidenceItem {
+  id: string
+  title: string
+  url: string
+  summary?: string | null
+  content?: string | null
+  author?: string | null
+  publishedAt?: string | null
+  source: SourceRecord
+}
 export interface SourceRecord {
   id: string
   name: string

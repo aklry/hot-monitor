@@ -18,6 +18,7 @@ import { NotificationsPage } from "./pages/NotificationsPage"
 import { SettingsPage } from "./pages/SettingsPage"
 import { SourcesPage } from "./pages/SourcesPage"
 import { TrendsPage } from "./pages/TrendsPage"
+import { TrendDetailPage } from "./pages/TrendDetailPage"
 import { requestBrowserNotificationPermission } from "./utils/browser-notifications"
 
 type Page = "dashboard" | "monitors" | "trends" | "sources" | "notifications" | "settings"
@@ -64,7 +65,9 @@ export function App() {
     return () => stream.close()
   }, [])
 
-  const currentTitle = navItems.find((item) => item.path === location.pathname)?.label ?? "Signal"
+  const currentTitle = location.pathname.startsWith("/trends/")
+    ? "Radar"
+    : (navItems.find((item) => item.path === location.pathname)?.label ?? "Signal")
 
   return (
     <div className="app-shell">
@@ -112,6 +115,7 @@ export function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/monitors" element={<MonitorsPage />} />
           <Route path="/trends" element={<TrendsPage />} />
+          <Route path="/trends/:id" element={<TrendDetailPage />} />
           <Route path="/sources" element={<SourcesPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
