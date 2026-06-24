@@ -1,12 +1,14 @@
 import { FormEvent, useEffect, useState } from "react"
-import { apiGet, apiPatch, apiPost } from "../api/client"
-import type { SourceRecord } from "../types"
+import { apiDelete, apiGet, apiPatch, apiPost } from "../../api/client"
+import type { SourceRecord } from "../../types"
+import "./SourcesPage.css"
 
 export function SourcesPage() {
   const [sources, setSources] = useState<SourceRecord[]>([])
   const [name, setName] = useState("")
   const [url, setUrl] = useState("")
   const [message, setMessage] = useState("")
+  const [pendingDelete, setPendingDelete] = useState<SourceRecord | null>(null)
 
   const load = () => apiGet<SourceRecord[]>("/sources").then(setSources)
 
@@ -22,8 +24,22 @@ export function SourcesPage() {
     await load()
   }
 
+  async function confirmDelete() {
+    if (!pendingDelete) return
+    const source = pendingDelete
+    setPendingDelete(null)
+
+    try {
+      await apiDelete(`/sources/${source.id}`)
+      setMessage(`${source.name} deleted`)
+      await load()
+    } catch (error) {
+      setMessage(`${source.name}: ${(error as Error).message}`)
+    }
+  }
+
   return (
-    <section className="stack">
+    <section className="sources-page">
       <form className="panel form-grid" onSubmit={add}>
         <label>
           RSS name
@@ -67,10 +83,31 @@ export function SourcesPage() {
               >
                 {source.enabled ? "Disable" : "Enable"}
               </button>
+              <button className="danger" onClick={() => setPendingDelete(source)}>
+                Delete
+              </button>
             </div>
           </article>
         ))}
       </div>
+
+      {pendingDelete && (
+        <div className="modal-overlay" onClick={() => setPendingDelete(null)}>
+          <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete source</h3>
+            <p>
+              Are you sure you want to delete <strong>{pendingDelete.name}</strong>?
+              This also removes all collected items from it.
+            </p>
+            <div className="modal-actions">
+              <button onClick={() => setPendingDelete(null)}>Cancel</button>
+              <button className="danger" onClick={() => void confirmDelete()}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

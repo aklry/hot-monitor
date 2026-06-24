@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react"
-import { apiDelete, apiGet, apiPatch, apiPost } from "../api/client"
-import type { MonitorKeyword } from "../types"
+import { apiDelete, apiGet, apiPatch, apiPost } from "../../api/client"
+import type { MonitorKeyword } from "../../types"
+import "./MonitorsPage.css"
 
 export function MonitorsPage() {
   const [monitors, setMonitors] = useState<MonitorKeyword[]>([])
@@ -32,7 +33,7 @@ export function MonitorsPage() {
   }
 
   return (
-    <section className="stack">
+    <section className="monitors-page">
       <form className="panel form-grid" onSubmit={submit}>
         <label>
           Keyword

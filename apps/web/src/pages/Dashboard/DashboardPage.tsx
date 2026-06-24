@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
-import { apiGet } from "../api/client"
-import type { DashboardSummary } from "../types"
+import { apiGet } from "../../api/client"
+import type { DashboardSummary } from "../../types"
+import "./DashboardPage.css"
 
 export function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null)
@@ -15,7 +16,7 @@ export function DashboardPage() {
   }
 
   return (
-    <section className="console-grid">
+    <section className="dashboard-page console-grid">
       <div className="metric-strip">
         <Metric label="Active monitors" value={summary?.activeMonitors ?? 0} />
         <Metric label="Today hits" value={summary?.todayHits ?? 0} />
@@ -96,4 +97,3 @@ function Metric({ label, value, tone }: { label: string; value: number; tone?: "
     </div>
   )
 }
-

@@ -35,6 +35,10 @@ export class SourcesService {
     return this.prisma.source.update({ where: { id }, data: input })
   }
 
+  async deleteSource(id: string) {
+    return this.prisma.source.delete({ where: { id } })
+  }
+
   async testSource(id: string, query = "ai") {
     const source = await this.prisma.source.findUniqueOrThrow({ where: { id } })
     const adapter = this.adapterForSource(source)

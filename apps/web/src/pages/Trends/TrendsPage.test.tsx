@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { MemoryRouter, Route, Routes } from "react-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { TrendsPage } from "./TrendsPage"
-import { TrendDetailPage } from "./TrendDetailPage"
+import { TrendDetailPage } from "../TrendDetail/TrendDetailPage"
 
 const trend = {
   id: "trend-1",

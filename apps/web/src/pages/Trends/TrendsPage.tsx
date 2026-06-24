@@ -1,8 +1,9 @@
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router"
 import { Layers, TrendingUp, Activity, Radar } from "lucide-react"
-import { apiGet, apiPost } from "../api/client"
-import type { TrendTopic } from "../types"
+import { apiGet, apiPost } from "../../api/client"
+import type { TrendTopic } from "../../types"
+import "./TrendsPage.css"
 
 type FilterKey = "all" | "high" | "recent"
 
@@ -74,18 +75,15 @@ export function TrendsPage() {
     <div className="trends-page">
       {/* Scope input */}
       <form className="trends-filters" onSubmit={run}>
-        <label style={{ flex: 1, minWidth: 180 }}>
-          <span style={{ fontSize: "0.72rem", color: "#72c7ad", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-            监控范围
-          </span>
+        <label className="trends-scope-label">
+          <span>监控范围</span>
           <input
             value={scope}
             onChange={(e) => setScope(e.target.value)}
             placeholder="输入关键词…"
-            style={{ marginTop: 4 }}
           />
         </label>
-        <button className="primary" type="submit" style={{ alignSelf: "flex-end" }}>
+        <button className="primary trends-scan-btn" type="submit">
           扫描趋势
         </button>
       </form>
@@ -160,7 +158,7 @@ export function TrendsPage() {
               {trend.summary && <p className="trend-card-summary">{trend.summary}</p>}
 
               <div className="trend-card-meta">
-                <span className="detail-meta-chip" style={{ padding: "0.2rem 0.5rem", fontSize: "0.7rem" }}>
+                <span className="detail-meta-chip">
                   <TrendingUp size={12} /> 增长 {Math.round(trend.growthScore)}
                 </span>
                 <span className="source-badge">{trend.evidenceCount} 条证据</span>

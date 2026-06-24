@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react"
-import { apiGet, apiPatch, apiPost } from "../api/client"
-import { requestBrowserNotificationPermission } from "../utils/browser-notifications"
+import { apiGet, apiPatch, apiPost } from "../../api/client"
+import { requestBrowserNotificationPermission } from "../../utils/browser-notifications"
+import "./SettingsPage.css"
 
 export function SettingsPage() {
   const [settings, setSettings] = useState<Record<string, string>>({})
@@ -21,7 +22,7 @@ export function SettingsPage() {
   }
 
   return (
-    <form className="settings-grid" onSubmit={save}>
+    <form className="settings-page settings-grid" onSubmit={save}>
       <Field label="DeepSeek API Key" value={settings.DEEPSEEK_API_KEY ?? ""} onChange={(v) => update("DEEPSEEK_API_KEY", v)} />
       <Field label="DeepSeek Model" value={settings.DEEPSEEK_MODEL ?? "deepseek-v4-flash"} onChange={(v) => update("DEEPSEEK_MODEL", v)} />
       <Field label="SMTP Host" value={settings.SMTP_HOST ?? ""} onChange={(v) => update("SMTP_HOST", v)} />

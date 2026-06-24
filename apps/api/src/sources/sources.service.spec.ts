@@ -16,19 +16,20 @@ import { SourcesService } from "./sources.service"
 function createService(source: { id: string; name: string; type: string; url: string | null }) {
   const prisma = {
     source: {
-      findUniqueOrThrow: jest.fn().mockResolvedValue(source)
+      findUniqueOrThrow: jest.fn().mockResolvedValue(source),
+      delete: jest.fn().mockResolvedValue(source)
     }
   }
   const config = {
     get: jest.fn().mockReturnValue("")
   }
 
-  return new SourcesService(prisma as never, config as never)
+  return { prisma, service: new SourcesService(prisma as never, config as never) }
 }
 
 describe("SourcesService", () => {
   it("returns a clear error when an RSS source URL is not a valid feed", async () => {
-    const service = createService({
+    const { service } = createService({
       id: "source-1",
       name: "Weibo",
       type: "rss",
@@ -42,7 +43,7 @@ describe("SourcesService", () => {
   })
 
   it("returns a clear error when X search has no bearer token", async () => {
-    const service = createService({
+    const { service } = createService({
       id: "source-2",
       name: "X Recent Search",
       type: "x",
@@ -52,5 +53,17 @@ describe("SourcesService", () => {
     await expect(service.testSource("source-2", "ai")).rejects.toThrow(
       "X_BEARER_TOKEN is required for X Recent Search"
     )
+  })
+
+  it("deletes a source by id", async () => {
+    const { prisma, service } = createService({
+      id: "source-3",
+      name: "Example Feed",
+      type: "rss",
+      url: "https://example.com/feed.xml"
+    })
+
+    await expect(service.deleteSource("source-3")).resolves.toMatchObject({ id: "source-3" })
+    expect(prisma.source.delete).toHaveBeenCalledWith({ where: { id: "source-3" } })
   })
 })

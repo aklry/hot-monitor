@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router"
 import { ArrowLeft, ExternalLink, TrendingUp, FileText, Clock } from "lucide-react"
-import { apiGet } from "../api/client"
-import type { TrendDetail } from "../types"
+import { apiGet } from "../../api/client"
+import type { TrendDetail } from "../../types"
+import "./TrendDetailPage.css"
 
 export function TrendDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -117,9 +118,7 @@ export function TrendDetailPage() {
               <p className="evidence-card-summary">{evidence.item.summary}</p>
             )}
             {evidence.aiReason && (
-              <p className="evidence-card-summary" style={{ color: "#a3bfb5" }}>
-                {evidence.aiReason}
-              </p>
+              <p className="evidence-card-reason">{evidence.aiReason}</p>
             )}
             <div className="evidence-card-meta">
               <span className="source-badge">{evidence.item.source.name}</span>
@@ -130,7 +129,7 @@ export function TrendDetailPage() {
                 <span className="time-label">{formatDate(evidence.item.publishedAt)}</span>
               )}
               {evidence.sourceWeight != null && (
-                <span className="detail-meta-chip" style={{ padding: "0.15rem 0.45rem", fontSize: "0.7rem" }}>
+                <span className="detail-meta-chip evidence-weight-chip">
                   权重 {evidence.sourceWeight}
                 </span>
               )}

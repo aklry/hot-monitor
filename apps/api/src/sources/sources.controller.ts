@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common"
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common"
 import { SourcesService } from "./sources.service"
 
 @Controller("sources")
@@ -18,6 +18,11 @@ export class SourcesController {
   @Patch(":id")
   updateSource(@Param("id") id: string, @Body() body: { enabled?: boolean; weight?: number }) {
     return this.sources.updateSource(id, body)
+  }
+
+  @Delete(":id")
+  deleteSource(@Param("id") id: string) {
+    return this.sources.deleteSource(id)
   }
 
   @Post(":id/test")
