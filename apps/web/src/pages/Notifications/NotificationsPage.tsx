@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { apiGet, apiPatch, apiPost } from "../../api/client"
-import type { NotificationRecord } from "../../types"
+import { apiGet, apiPatch, apiPost } from "$/api/client"
+import type { NotificationRecord } from "$/types"
 import "./NotificationsPage.css"
 
 export function NotificationsPage() {

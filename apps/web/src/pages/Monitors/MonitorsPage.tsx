@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react"
-import { apiDelete, apiGet, apiPatch, apiPost } from "../../api/client"
-import type { MonitorKeyword } from "../../types"
+import { apiDelete, apiGet, apiPatch, apiPost } from "$/api/client"
+import type { MonitorKeyword } from "$/types"
 import "./MonitorsPage.css"
 
 export function MonitorsPage() {

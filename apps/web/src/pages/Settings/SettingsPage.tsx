@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react"
-import { apiGet, apiPatch, apiPost } from "../../api/client"
-import { requestBrowserNotificationPermission } from "../../utils/browser-notifications"
+import { apiGet, apiPatch, apiPost } from "$/api/client"
+import { requestBrowserNotificationPermission } from "$/utils/browser-notifications"
 import "./SettingsPage.css"
 
 export function SettingsPage() {

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router"
 import { ArrowLeft, ExternalLink, TrendingUp, FileText, Clock } from "lucide-react"
-import { apiGet } from "../../api/client"
-import type { TrendDetail } from "../../types"
+import { apiGet } from "$/api/client"
+import type { TrendDetail } from "$/types"
 import "./TrendDetailPage.css"
 
 export function TrendDetailPage() {

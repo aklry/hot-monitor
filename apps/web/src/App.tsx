@@ -10,16 +10,16 @@ import {
   Settings,
   Zap
 } from "lucide-react"
-import { notificationStream } from "./api/client"
-import type { NotificationRecord } from "./types"
-import { DashboardPage } from "./pages/Dashboard/DashboardPage"
-import { MonitorsPage } from "./pages/Monitors/MonitorsPage"
-import { NotificationsPage } from "./pages/Notifications/NotificationsPage"
-import { SettingsPage } from "./pages/Settings/SettingsPage"
-import { SourcesPage } from "./pages/Sources/SourcesPage"
-import { TrendsPage } from "./pages/Trends/TrendsPage"
-import { TrendDetailPage } from "./pages/TrendDetail/TrendDetailPage"
-import { requestBrowserNotificationPermission } from "./utils/browser-notifications"
+import { notificationStream } from "$/api/client"
+import type { NotificationRecord } from "$/types"
+import { DashboardPage } from "$/pages/Dashboard/DashboardPage"
+import { MonitorsPage } from "$/pages/Monitors/MonitorsPage"
+import { NotificationsPage } from "$/pages/Notifications/NotificationsPage"
+import { SettingsPage } from "$/pages/Settings/SettingsPage"
+import { SourcesPage } from "$/pages/Sources/SourcesPage"
+import { TrendsPage } from "$/pages/Trends/TrendsPage"
+import { TrendDetailPage } from "$/pages/TrendDetail/TrendDetailPage"
+import { requestBrowserNotificationPermission } from "$/utils/browser-notifications"
 
 type Page = "dashboard" | "monitors" | "trends" | "sources" | "notifications" | "settings"
 

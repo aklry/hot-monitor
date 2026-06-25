@@ -1,8 +1,8 @@
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router"
 import { Layers, TrendingUp, Activity, Radar } from "lucide-react"
-import { apiGet, apiPost } from "../../api/client"
-import type { TrendTopic } from "../../types"
+import { apiGet, apiPost } from "$/api/client"
+import type { TrendTopic } from "$/types"
 import "./TrendsPage.css"
 
 type FilterKey = "all" | "high" | "recent"

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { apiGet } from "../../api/client"
-import type { DashboardSummary } from "../../types"
+import { apiGet } from "$/api/client"
+import type { DashboardSummary } from "$/types"
 import "./DashboardPage.css"
 
 export function DashboardPage() {
