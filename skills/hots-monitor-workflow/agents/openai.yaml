@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hots Monitor Workflow"
+  short_description: "Project workflow and commit discipline for Hots Monitor."
+  default_prompt: "Use this skill when working in the hots-monitor repository."
