@@ -49,7 +49,9 @@ describe("App", () => {
       </MemoryRouter>
     )
 
-    expect(await screen.findByRole("heading", { name: "AI agents reshape developer workflows" })).toBeInTheDocument()
+    expect(
+      await screen.findByRole("heading", { name: "AI agents reshape developer workflows" })
+    ).toBeInTheDocument()
   })
 
   it("renders a route from the current location", () => {

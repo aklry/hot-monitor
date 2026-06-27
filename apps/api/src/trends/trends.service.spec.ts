@@ -16,7 +16,12 @@ describe("TrendsService", () => {
   it("does not create a trend when all dated evidence is stale", async () => {
     const prisma = {
       collectedItem: { upsert: jest.fn() },
-      trendTopic: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn() },
+      trendTopic: {
+        create: jest.fn(),
+        findMany: jest.fn(),
+        findUnique: jest.fn(),
+        update: jest.fn()
+      },
       trendSnapshot: { create: jest.fn() },
       trendEvidence: { count: jest.fn(), upsert: jest.fn() }
     }
@@ -100,7 +105,12 @@ describe("TrendsService", () => {
         hotScore: 95,
         growthScore: 61,
         whyNow: "Fresh coverage from developer tooling sources.",
-        evidence: [{ itemUrl: "https://example.com/agent-tools", reason: "New evidence confirms acceleration." }]
+        evidence: [
+          {
+            itemUrl: "https://example.com/agent-tools",
+            reason: "New evidence confirms acceleration."
+          }
+        ]
       })
     }
     const service = new TrendsService(prisma as never, sources as never, trendAnalysis as never)

@@ -47,20 +47,20 @@ model Source {
 }
 
 model CollectedItem {
-  id          String          @id @default(cuid())
-  sourceId    String
-  source      Source          @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-  externalId  String?
-  title       String
-  url         String
-  author      String?
-  summary     String?
-  content     String?
-  publishedAt DateTime?
-  fetchedAt   DateTime        @default(now())
-  hash        String          @unique
-  analyses    AiAnalysis[]
-  evidences   TrendEvidence[]
+  id            String          @id @default(cuid())
+  sourceId      String
+  source        Source          @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  externalId    String?
+  title         String
+  url           String
+  author        String?
+  summary       String?
+  content       String?
+  publishedAt   DateTime?
+  fetchedAt     DateTime        @default(now())
+  hash          String          @unique
+  analyses      AiAnalysis[]
+  evidences     TrendEvidence[]
   notifications Notification[]
 
   @@index([url])

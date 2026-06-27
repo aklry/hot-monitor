@@ -147,7 +147,15 @@ export class TrendsService {
         include: { evidences: true }
       })
 
-      await this.createSnapshot(matchingTrend.id, hotScore, analysis.growthScore, items.length, sourceCount, status, now)
+      await this.createSnapshot(
+        matchingTrend.id,
+        hotScore,
+        analysis.growthScore,
+        items.length,
+        sourceCount,
+        status,
+        now
+      )
 
       return { trend, candidates: candidates.length, evidence: items.length, merged: true }
     }
@@ -177,7 +185,15 @@ export class TrendsService {
       include: { evidences: true }
     })
 
-    await this.createSnapshot(trend.id, hotScore, analysis.growthScore, items.length, sourceCount, status, now)
+    await this.createSnapshot(
+      trend.id,
+      hotScore,
+      analysis.growthScore,
+      items.length,
+      sourceCount,
+      status,
+      now
+    )
 
     return { trend, candidates: candidates.length, evidence: items.length, merged: false }
   }

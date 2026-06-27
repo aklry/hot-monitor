@@ -109,9 +109,13 @@ describe("Radar trends", () => {
       </MemoryRouter>
     )
 
-    await user.click(await screen.findByRole("link", { name: /AI agents reshape developer workflows/i }))
+    await user.click(
+      await screen.findByRole("link", { name: /AI agents reshape developer workflows/i })
+    )
 
-    expect(await screen.findByRole("heading", { name: /AI agents reshape developer workflows/i })).toBeInTheDocument()
+    expect(
+      await screen.findByRole("heading", { name: /AI agents reshape developer workflows/i })
+    ).toBeInTheDocument()
     expect(screen.getByText("观察中")).toBeInTheDocument()
     expect(screen.getByText(/Multiple developer tool launches/i)).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /Agent tools move into IDEs/i })).toHaveAttribute(
@@ -137,15 +141,21 @@ describe("Radar trends", () => {
     await user.type(scopeInput, "security")
     await user.click(screen.getByRole("button", { name: "扫描趋势" }))
 
-    expect(await screen.findByRole("link", { name: /Security teams adopt agentic review workflows/i })).toBeInTheDocument()
+    expect(
+      await screen.findByRole("link", { name: /Security teams adopt agentic review workflows/i })
+    ).toBeInTheDocument()
     expect(screen.getByText("快速上升")).toBeInTheDocument()
     expect(screen.getByText("2 次快照")).toBeInTheDocument()
 
-    await user.click(screen.getByRole("link", { name: /Security teams adopt agentic review workflows/i }))
+    await user.click(
+      screen.getByRole("link", { name: /Security teams adopt agentic review workflows/i })
+    )
     await user.click(await screen.findByRole("link", { name: "返回趋势列表" }))
 
     expect(screen.getByDisplayValue("security")).toBeInTheDocument()
-    expect(await screen.findByRole("link", { name: /Security teams adopt agentic review workflows/i })).toBeInTheDocument()
+    expect(
+      await screen.findByRole("link", { name: /Security teams adopt agentic review workflows/i })
+    ).toBeInTheDocument()
   })
 })
 

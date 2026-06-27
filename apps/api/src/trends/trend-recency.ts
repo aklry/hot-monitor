@@ -43,6 +43,9 @@ export function filterCurrentTrendCandidates(
   return { candidates: currentCandidates, recentDatedCount }
 }
 
-export function hasCurrentTrendEvidence(candidates: CollectedCandidate[], now = new Date()): boolean {
+export function hasCurrentTrendEvidence(
+  candidates: CollectedCandidate[],
+  now = new Date()
+): boolean {
   return filterCurrentTrendCandidates(candidates, now).recentDatedCount > 0
 }

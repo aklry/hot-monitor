@@ -14,7 +14,8 @@ export class MailerService {
     const smtp = await this.settings.getSmtpSettings()
     const host = smtp.SMTP_HOST ?? this.config.get<string>("SMTP_HOST")
     const port = Number(smtp.SMTP_PORT ?? this.config.get<string>("SMTP_PORT") ?? 587)
-    const secure = String(smtp.SMTP_SECURE ?? this.config.get<string>("SMTP_SECURE") ?? "false") === "true"
+    const secure =
+      String(smtp.SMTP_SECURE ?? this.config.get<string>("SMTP_SECURE") ?? "false") === "true"
     const user = smtp.SMTP_USER ?? this.config.get<string>("SMTP_USER")
     const pass = smtp.SMTP_PASS ?? this.config.get<string>("SMTP_PASS")
     const from = smtp.SMTP_FROM ?? this.config.get<string>("SMTP_FROM")

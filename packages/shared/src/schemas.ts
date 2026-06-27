@@ -1,13 +1,16 @@
 import { z } from "zod"
 
-const aiRiskLevel = z.preprocess((value) => {
-  if (typeof value !== "string") {
-    return value
-  }
+const aiRiskLevel = z.preprocess(
+  (value) => {
+    if (typeof value !== "string") {
+      return value
+    }
 
-  const normalized = value.trim().toLowerCase()
-  return ["", "none", "no", "n/a", "na", "null"].includes(normalized) ? "low" : normalized
-}, z.enum(["low", "medium", "high"]))
+    const normalized = value.trim().toLowerCase()
+    return ["", "none", "no", "n/a", "na", "null"].includes(normalized) ? "low" : normalized
+  },
+  z.enum(["low", "medium", "high"])
+)
 
 export const RiskLevelSchema = aiRiskLevel
 export const UrgencySchema = z.enum(["low", "medium", "high"])

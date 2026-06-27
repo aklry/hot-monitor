@@ -48,7 +48,9 @@ describe("SourcesPage", () => {
     await user.click(screen.getByRole("button", { name: /Cancel/i }))
 
     expect(screen.queryByText(/Are you sure you want to delete/i)).not.toBeInTheDocument()
-    expect(fetch).not.toHaveBeenCalledWith("http://localhost:4000/sources/source-1", { method: "DELETE" })
+    expect(fetch).not.toHaveBeenCalledWith("http://localhost:4000/sources/source-1", {
+      method: "DELETE"
+    })
   })
 
   it("deletes a source after confirmation and reloads the list", async () => {
@@ -61,7 +63,9 @@ describe("SourcesPage", () => {
     await user.click(screen.getAllByRole("button", { name: /Delete/i })[1])
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith("http://localhost:4000/sources/source-1", { method: "DELETE" })
+      expect(fetch).toHaveBeenCalledWith("http://localhost:4000/sources/source-1", {
+        method: "DELETE"
+      })
     })
     expect(await screen.findByText("Example Feed deleted")).toBeInTheDocument()
     expect(fetch).toHaveBeenCalledWith("http://localhost:4000/sources")

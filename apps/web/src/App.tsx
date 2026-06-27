@@ -1,15 +1,6 @@
 import { useEffect, useState } from "react"
 import { Navigate, NavLink, Route, Routes, useLocation } from "react-router"
-import {
-  Bell,
-  Database,
-  Gauge,
-  Radio,
-  Radar,
-  Search,
-  Settings,
-  Zap
-} from "lucide-react"
+import { Bell, Database, Gauge, Radio, Radar, Search, Settings, Zap } from "lucide-react"
 import { notificationStream } from "$/api/client"
 import type { NotificationRecord } from "$/types"
 import { DashboardPage } from "$/pages/Dashboard/DashboardPage"

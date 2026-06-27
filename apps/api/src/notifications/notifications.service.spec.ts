@@ -77,5 +77,3 @@ describe("NotificationsService", () => {
     })
   })
 })
-
-

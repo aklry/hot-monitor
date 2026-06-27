@@ -17,6 +17,8 @@ describe("parseAiJson", () => {
   })
 
   it("throws a clear error for schema mismatches", () => {
-    expect(() => parseAiJson('{"ok":"yes"}', TestSchema)).toThrow("AI response did not match schema")
+    expect(() => parseAiJson('{"ok":"yes"}', TestSchema)).toThrow(
+      "AI response did not match schema"
+    )
   })
 })

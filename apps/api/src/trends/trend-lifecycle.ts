@@ -73,8 +73,8 @@ function tokenizeTitle(title: string): Set<string> {
     .toLowerCase()
     .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, " ")
     .split(/\s+/)
-    .map(token => singularize(token.trim()))
-    .filter(token => token.length >= 2 && !STOP_WORDS.has(token))
+    .map((token) => singularize(token.trim()))
+    .filter((token) => token.length >= 2 && !STOP_WORDS.has(token))
 
   return new Set(tokens)
 }

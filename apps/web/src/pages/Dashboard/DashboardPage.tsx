@@ -8,7 +8,9 @@ export function DashboardPage() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    apiGet<DashboardSummary>("/dashboard/summary").then(setSummary).catch((err) => setError(err.message))
+    apiGet<DashboardSummary>("/dashboard/summary")
+      .then(setSummary)
+      .catch((err) => setError(err.message))
   }, [])
 
   if (error) {
@@ -36,7 +38,12 @@ export function DashboardPage() {
                 <strong>{item.title}</strong>
                 <p>{item.message}</p>
                 {item.relatedItem && (
-                  <a className="article-link" href={item.relatedItem.url} target="_blank" rel="noreferrer">
+                  <a
+                    className="article-link"
+                    href={item.relatedItem.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     {item.relatedItem.title}
                   </a>
                 )}
@@ -65,7 +72,9 @@ export function DashboardPage() {
             </div>
           </div>
         ))}
-        {!summary?.sources.length && <p className="muted">Add or seed sources to start collecting.</p>}
+        {!summary?.sources.length && (
+          <p className="muted">Add or seed sources to start collecting.</p>
+        )}
       </aside>
 
       <div className="panel trend-band">
@@ -82,7 +91,9 @@ export function DashboardPage() {
               </div>
             </article>
           ))}
-          {!summary?.latestTrends.length && <p className="muted">No trend topics discovered yet.</p>}
+          {!summary?.latestTrends.length && (
+            <p className="muted">No trend topics discovered yet.</p>
+          )}
         </div>
       </div>
     </section>

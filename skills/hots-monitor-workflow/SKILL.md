@@ -92,10 +92,10 @@ python C:\Users\32652\.codex\skills\.system\skill-creator\scripts\quick_validate
 
 ## Common Mistakes
 
-| Mistake | Correction |
-| --- | --- |
-| Finishing without a commit | Commit the completed task before final response. |
-| Staging the whole dirty tree | Stage only files owned by the current task. |
+| Mistake                                      | Correction                                                          |
+| -------------------------------------------- | ------------------------------------------------------------------- |
+| Finishing without a commit                   | Commit the completed task before final response.                    |
+| Staging the whole dirty tree                 | Stage only files owned by the current task.                         |
 | Adding frontend-only types for API contracts | Prefer shared Zod/type definitions when the shape is cross-package. |
-| Duplicating backend logic in skills | Call the existing backend endpoints. |
-| Running only broad tests after code changes | Start with focused tests so failures are easier to diagnose. |
+| Duplicating backend logic in skills          | Call the existing backend endpoints.                                |
+| Running only broad tests after code changes  | Start with focused tests so failures are easier to diagnose.        |

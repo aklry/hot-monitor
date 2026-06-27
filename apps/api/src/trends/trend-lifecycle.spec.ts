@@ -15,7 +15,9 @@ describe("trend lifecycle helpers", () => {
       }
     ]
 
-    expect(findMatchingTrend(existing, "AI agent tools reshape developer workflows")?.id).toBe("trend-1")
+    expect(findMatchingTrend(existing, "AI agent tools reshape developer workflows")?.id).toBe(
+      "trend-1"
+    )
   })
 
   it("marks fast-growing trends as surging", () => {

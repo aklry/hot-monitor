@@ -38,8 +38,18 @@ export class SettingsService {
   }
 
   async getSmtpSettings() {
-    const keys = ["SMTP_HOST", "SMTP_PORT", "SMTP_SECURE", "SMTP_USER", "SMTP_PASS", "SMTP_FROM", "SMTP_TO"]
-    const entries = await Promise.all(keys.map(async (key) => [key, await this.getRaw(key)] as const))
+    const keys = [
+      "SMTP_HOST",
+      "SMTP_PORT",
+      "SMTP_SECURE",
+      "SMTP_USER",
+      "SMTP_PASS",
+      "SMTP_FROM",
+      "SMTP_TO"
+    ]
+    const entries = await Promise.all(
+      keys.map(async (key) => [key, await this.getRaw(key)] as const)
+    )
     return Object.fromEntries(entries) as Record<string, string | undefined>
   }
 }

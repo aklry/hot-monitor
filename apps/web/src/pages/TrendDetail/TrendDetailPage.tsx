@@ -123,7 +123,9 @@ export function TrendDetailPage() {
                 <ExternalLink size={14} style={{ verticalAlign: "middle", marginLeft: 4 }} />
               </a>
             </h4>
-            {evidence.item.summary && <p className="evidence-card-summary">{evidence.item.summary}</p>}
+            {evidence.item.summary && (
+              <p className="evidence-card-summary">{evidence.item.summary}</p>
+            )}
             {evidence.aiReason && <p className="evidence-card-reason">{evidence.aiReason}</p>}
             <div className="evidence-card-meta">
               <span className="source-badge">{evidence.item.source.name}</span>
@@ -132,7 +134,9 @@ export function TrendDetailPage() {
                 <span className="time-label">{formatDate(evidence.item.publishedAt)}</span>
               )}
               {evidence.sourceWeight != null && (
-                <span className="detail-meta-chip evidence-weight-chip">权重 {evidence.sourceWeight}</span>
+                <span className="detail-meta-chip evidence-weight-chip">
+                  权重 {evidence.sourceWeight}
+                </span>
               )}
             </div>
           </article>

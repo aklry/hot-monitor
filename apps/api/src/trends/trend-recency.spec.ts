@@ -31,7 +31,10 @@ describe("trend recency", () => {
     )
 
     expect(result.recentDatedCount).toBe(1)
-    expect(result.candidates.map((candidate) => candidate.title)).toEqual(["Recent item", "Undated item"])
+    expect(result.candidates.map((candidate) => candidate.title)).toEqual([
+      "Recent item",
+      "Undated item"
+    ])
   })
 
   it("does not treat undated candidates alone as current evidence", () => {

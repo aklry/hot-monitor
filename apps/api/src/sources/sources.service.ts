@@ -70,7 +70,11 @@ export class SourcesService {
     return `Source test failed for ${source.name}: ${error.message}`
   }
 
-  private adapterForSource(source: { name: string; type: string; url: string | null }): SourceAdapter {
+  private adapterForSource(source: {
+    name: string
+    type: string
+    url: string | null
+  }): SourceAdapter {
     if (source.type === "rss" && source.url) {
       return new RssAdapter(source.name, source.url)
     }

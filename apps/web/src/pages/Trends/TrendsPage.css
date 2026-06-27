@@ -153,8 +153,12 @@
   border-radius: 12px;
   padding: 1px;
   background: linear-gradient(135deg, transparent 40%, rgba(101, 214, 181, 0.15));
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask-composite: exclude;
   -webkit-mask-composite: xor;
   pointer-events: none;
@@ -451,14 +455,30 @@
   animation: fadeSlideIn 0.35s ease-out both;
 }
 
-.trends-grid > *:nth-child(1) { animation-delay: 0ms; }
-.trends-grid > *:nth-child(2) { animation-delay: 40ms; }
-.trends-grid > *:nth-child(3) { animation-delay: 80ms; }
-.trends-grid > *:nth-child(4) { animation-delay: 120ms; }
-.trends-grid > *:nth-child(5) { animation-delay: 160ms; }
-.trends-grid > *:nth-child(6) { animation-delay: 200ms; }
-.trends-grid > *:nth-child(7) { animation-delay: 240ms; }
-.trends-grid > *:nth-child(8) { animation-delay: 280ms; }
+.trends-grid > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.trends-grid > *:nth-child(2) {
+  animation-delay: 40ms;
+}
+.trends-grid > *:nth-child(3) {
+  animation-delay: 80ms;
+}
+.trends-grid > *:nth-child(4) {
+  animation-delay: 120ms;
+}
+.trends-grid > *:nth-child(5) {
+  animation-delay: 160ms;
+}
+.trends-grid > *:nth-child(6) {
+  animation-delay: 200ms;
+}
+.trends-grid > *:nth-child(7) {
+  animation-delay: 240ms;
+}
+.trends-grid > *:nth-child(8) {
+  animation-delay: 280ms;
+}
 
 /* Responsive */
 @media (max-width: 768px) {

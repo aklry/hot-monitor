@@ -107,7 +107,12 @@ export class MonitorsService {
         await this.createHitNotifications(item.id, monitor.keyword, analysis.topic, analysis.reason)
         notifications += 1
       } else if (shouldNotifyRiskAlert(analysis)) {
-        await this.createRiskNotifications(item.id, monitor.keyword, analysis.topic, analysis.reason)
+        await this.createRiskNotifications(
+          item.id,
+          monitor.keyword,
+          analysis.topic,
+          analysis.reason
+        )
         notifications += 1
       }
     }
@@ -120,7 +125,12 @@ export class MonitorsService {
     return { candidates: candidates.length, analyzed, notifications }
   }
 
-  private async createHitNotifications(itemId: string, keyword: string, topic: string, reason: string) {
+  private async createHitNotifications(
+    itemId: string,
+    keyword: string,
+    topic: string,
+    reason: string
+  ) {
     await Promise.all([
       this.notifications.create({
         type: "keyword_hit",
@@ -149,7 +159,12 @@ export class MonitorsService {
     ])
   }
 
-  private async createRiskNotifications(itemId: string, keyword: string, topic: string, reason: string) {
+  private async createRiskNotifications(
+    itemId: string,
+    keyword: string,
+    topic: string,
+    reason: string
+  ) {
     await Promise.all([
       this.notifications.create({
         type: "risk_alert",

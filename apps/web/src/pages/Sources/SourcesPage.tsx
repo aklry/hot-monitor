@@ -96,8 +96,8 @@ export function SourcesPage() {
           <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
             <h3>Delete source</h3>
             <p>
-              Are you sure you want to delete <strong>{pendingDelete.name}</strong>?
-              This also removes all collected items from it.
+              Are you sure you want to delete <strong>{pendingDelete.name}</strong>? This also
+              removes all collected items from it.
             </p>
             <div className="modal-actions">
               <button onClick={() => setPendingDelete(null)}>Cancel</button>

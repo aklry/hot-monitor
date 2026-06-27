@@ -246,7 +246,9 @@ export function TrendsPage() {
                   <span className="source-badge">{trend.snapshots.length} 次快照</span>
                 )}
                 {formatDuration(trend.firstSeenAt, trend.lastSeenAt) && (
-                  <span className="time-label">{formatDuration(trend.firstSeenAt, trend.lastSeenAt)}</span>
+                  <span className="time-label">
+                    {formatDuration(trend.firstSeenAt, trend.lastSeenAt)}
+                  </span>
                 )}
                 <span className="time-label">{formatRelativeTime(trend.lastSeenAt)}</span>
               </div>
