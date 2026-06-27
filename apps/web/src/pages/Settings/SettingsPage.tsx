@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react"
+import { type FormEvent, useEffect, useState } from "react"
 import { apiGet, apiPatch, apiPost } from "$/api/client"
 import { requestBrowserNotificationPermission } from "$/utils/browser-notifications"
 import "./SettingsPage.css"
@@ -8,7 +8,11 @@ export function SettingsPage() {
   const [message, setMessage] = useState("")
 
   useEffect(() => {
-    apiGet<Record<string, string>>("/settings").then(setSettings)
+    void apiGet<Record<string, string>>("/settings")
+      .then(setSettings)
+      .catch((error: unknown) => {
+        setMessage(error instanceof Error ? error.message : "Failed to load settings")
+      })
   }, [])
 
   function update(key: string, value: string) {

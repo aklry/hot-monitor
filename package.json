@@ -9,12 +9,22 @@
     "dev:web": "pnpm --filter @hots-monitor/web dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
-    "lint": "pnpm -r lint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "typecheck": "pnpm -r typecheck",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
     "prisma:generate": "pnpm --filter @hots-monitor/api prisma:generate",
     "prisma:migrate": "pnpm --filter @hots-monitor/api prisma:migrate"
   },
   "devDependencies": {
-    "typescript": "^5.5.4"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.6.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.0",
+    "prettier-plugin-prisma": "^5.0.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.62.0"
   }
 }

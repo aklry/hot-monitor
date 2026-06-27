@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+pnpm-lock.yaml
+
+apps/api/dist/
+apps/api/coverage/
+apps/api/prisma/dev.db
+apps/api/prisma/dev.db-journal
+apps/api/src/generated/prisma/
+
+apps/web/dist/
+apps/web/coverage/
+
+packages/shared/dist/
+
+docs/superpowers/

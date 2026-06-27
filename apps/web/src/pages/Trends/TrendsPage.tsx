@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react"
+import { type FormEvent, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router"
 import { Layers, TrendingUp, Activity, Radar } from "lucide-react"
 import { apiGet, apiPost } from "$/api/client"

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react"
+import { type FormEvent, useEffect, useState } from "react"
 import { apiDelete, apiGet, apiPatch, apiPost } from "$/api/client"
 import type { SourceRecord } from "$/types"
 import "./SourcesPage.css"
