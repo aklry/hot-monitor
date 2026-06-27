@@ -58,23 +58,18 @@ export function TrendDetailPage() {
 
   return (
     <div className="detail-page">
-      {/* Back button */}
       <Link className="detail-back-btn" to="/trends">
         <ArrowLeft size={16} /> 返回趋势列表
       </Link>
 
-      {/* Hero card */}
       <div className="detail-hero">
         <div>
           {trend.scope && <p className="eyebrow">{trend.scope}</p>}
           <h2 className="detail-hero-title">{trend.title}</h2>
         </div>
 
-        {trend.summary && (
-          <p className="detail-hero-summary">{trend.summary}</p>
-        )}
+        {trend.summary && <p className="detail-hero-summary">{trend.summary}</p>}
 
-        {/* Meta chips */}
         <div className="detail-meta-row">
           {trend.hotScore != null && (
             <div className="detail-meta-chip">
@@ -103,7 +98,6 @@ export function TrendDetailPage() {
         </div>
       </div>
 
-      {/* Evidence section */}
       <div className="detail-section">
         <h3 className="detail-section-title">相关证据</h3>
         {trend.evidences.map((evidence) => (
@@ -114,24 +108,16 @@ export function TrendDetailPage() {
                 <ExternalLink size={14} style={{ verticalAlign: "middle", marginLeft: 4 }} />
               </a>
             </h4>
-            {evidence.item.summary && (
-              <p className="evidence-card-summary">{evidence.item.summary}</p>
-            )}
-            {evidence.aiReason && (
-              <p className="evidence-card-reason">{evidence.aiReason}</p>
-            )}
+            {evidence.item.summary && <p className="evidence-card-summary">{evidence.item.summary}</p>}
+            {evidence.aiReason && <p className="evidence-card-reason">{evidence.aiReason}</p>}
             <div className="evidence-card-meta">
               <span className="source-badge">{evidence.item.source.name}</span>
-              {evidence.item.author && (
-                <span className="source-badge">{evidence.item.author}</span>
-              )}
+              {evidence.item.author && <span className="source-badge">{evidence.item.author}</span>}
               {evidence.item.publishedAt && (
                 <span className="time-label">{formatDate(evidence.item.publishedAt)}</span>
               )}
               {evidence.sourceWeight != null && (
-                <span className="detail-meta-chip evidence-weight-chip">
-                  权重 {evidence.sourceWeight}
-                </span>
+                <span className="detail-meta-chip evidence-weight-chip">权重 {evidence.sourceWeight}</span>
               )}
             </div>
           </article>

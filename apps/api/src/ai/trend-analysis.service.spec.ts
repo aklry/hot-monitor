@@ -32,6 +32,8 @@ describe("TrendAnalysisService", () => {
         reason: "Several items point to the same trend."
       }
     ])
-    expect(client.completeJson).toHaveBeenCalledWith(expect.stringContaining("evidence field must be an array"))
+    expect(client.completeJson).toHaveBeenCalledWith(expect.stringContaining("evidence 字段必须是对象数组"), {
+      strict: true
+    })
   })
 })

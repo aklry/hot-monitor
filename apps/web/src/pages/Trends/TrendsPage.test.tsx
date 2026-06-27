@@ -16,6 +16,17 @@ const trend = {
   lastSeenAt: "2026-06-23T08:00:00.000Z"
 }
 
+const searchedTrend = {
+  id: "trend-2",
+  scope: "security",
+  title: "Security teams adopt agentic review workflows",
+  summary: "Security review is being folded into agent-assisted development loops.",
+  hotScore: 91,
+  growthScore: 55,
+  evidenceCount: 3,
+  lastSeenAt: "2026-06-24T08:00:00.000Z"
+}
+
 const detail = {
   ...trend,
   firstSeenAt: "2026-06-22T08:00:00.000Z",
@@ -46,15 +57,29 @@ const detail = {
 
 describe("Radar trends", () => {
   beforeEach(() => {
+    window.sessionStorage.clear()
     vi.stubGlobal(
       "fetch",
-      vi.fn(async (input: RequestInfo | URL) => {
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
         const url = input.toString()
+        if (url.endsWith("/trends/run-now") && init?.method === "POST") {
+          return jsonResponse({ candidates: 1, evidence: 1 })
+        }
         if (url.endsWith("/trends?scope=ai%20programming")) {
           return jsonResponse([trend])
         }
+        if (url.endsWith("/trends?scope=security")) {
+          return jsonResponse([searchedTrend])
+        }
         if (url.endsWith("/trends/trend-1")) {
           return jsonResponse(detail)
+        }
+        if (url.endsWith("/trends/trend-2")) {
+          return jsonResponse({
+            ...searchedTrend,
+            firstSeenAt: "2026-06-23T08:00:00.000Z",
+            evidences: []
+          })
         }
         return jsonResponse({ message: "Not found" }, { status: 404 })
       })
@@ -63,6 +88,7 @@ describe("Radar trends", () => {
 
   afterEach(() => {
     vi.unstubAllGlobals()
+    window.sessionStorage.clear()
   })
 
   it("opens the trend detail route from a Radar result", async () => {
@@ -85,6 +111,32 @@ describe("Radar trends", () => {
       "href",
       "https://example.com/agents-in-ides"
     )
+  })
+
+  it("restores the searched trends after returning from detail without changing the list route", async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter initialEntries={["/trends"]}>
+        <Routes>
+          <Route path="/trends" element={<TrendsPage />} />
+          <Route path="/trends/:id" element={<TrendDetailPage />} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    const scopeInput = await screen.findByPlaceholderText("输入关键词…")
+    await user.clear(scopeInput)
+    await user.type(scopeInput, "security")
+    await user.click(screen.getByRole("button", { name: "扫描趋势" }))
+
+    expect(await screen.findByRole("link", { name: /Security teams adopt agentic review workflows/i })).toBeInTheDocument()
+
+    await user.click(screen.getByRole("link", { name: /Security teams adopt agentic review workflows/i }))
+    await user.click(await screen.findByRole("link", { name: "返回趋势列表" }))
+
+    expect(screen.getByDisplayValue("security")).toBeInTheDocument()
+    expect(await screen.findByRole("link", { name: /Security teams adopt agentic review workflows/i })).toBeInTheDocument()
   })
 })
 

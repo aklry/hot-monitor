@@ -7,11 +7,50 @@ import "./TrendsPage.css"
 
 type FilterKey = "all" | "high" | "recent"
 
+type StoredTrendState = {
+  scope: string
+  filter: FilterKey
+  trends: TrendTopic[]
+}
+
 const FILTERS: Array<{ key: FilterKey; label: string }> = [
   { key: "all", label: "全部" },
   { key: "high", label: "高热度" },
   { key: "recent", label: "最近更新" }
 ]
+
+const DEFAULT_SCOPE = "ai programming"
+const STORAGE_KEY = "trends-page-state"
+
+function readStoredState(): StoredTrendState | null {
+  if (typeof window === "undefined") {
+    return null
+  }
+
+  const raw = window.sessionStorage.getItem(STORAGE_KEY)
+  if (!raw) {
+    return null
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as Partial<StoredTrendState>
+    if (
+      typeof parsed.scope === "string" &&
+      (parsed.filter === "all" || parsed.filter === "high" || parsed.filter === "recent") &&
+      Array.isArray(parsed.trends)
+    ) {
+      return {
+        scope: parsed.scope,
+        filter: parsed.filter,
+        trends: parsed.trends as TrendTopic[]
+      }
+    }
+  } catch {
+    window.sessionStorage.removeItem(STORAGE_KEY)
+  }
+
+  return null
+}
 
 function formatRelativeTime(dateStr?: string): string {
   if (!dateStr) return ""
@@ -26,18 +65,38 @@ function formatRelativeTime(dateStr?: string): string {
 }
 
 export function TrendsPage() {
-  const [scope, setScope] = useState("ai programming")
-  const [trends, setTrends] = useState<TrendTopic[]>([])
+  const storedState = readStoredState()
+  const [scope, setScope] = useState(storedState?.scope ?? DEFAULT_SCOPE)
+  const [trends, setTrends] = useState<TrendTopic[]>(storedState?.trends ?? [])
   const [message, setMessage] = useState("")
-  const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<FilterKey>("all")
+  const [loading, setLoading] = useState(!storedState)
+  const [filter, setFilter] = useState<FilterKey>(storedState?.filter ?? "all")
 
-  const load = () =>
-    apiGet<TrendTopic[]>(`/trends?scope=${encodeURIComponent(scope)}`).then(setTrends)
+  async function load(nextScope: string) {
+    setLoading(true)
+    try {
+      const result = await apiGet<TrendTopic[]>(`/trends?scope=${encodeURIComponent(nextScope)}`)
+      setTrends(result)
+      return result
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    void load().finally(() => setLoading(false))
+    if (!storedState) {
+      void load(DEFAULT_SCOPE)
+    }
   }, [])
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    const state: StoredTrendState = { scope, filter, trends }
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  }, [filter, scope, trends])
 
   async function run(event: FormEvent) {
     event.preventDefault()
@@ -46,25 +105,25 @@ export function TrendsPage() {
       scope
     })
     setMessage(`扫描完成：${result.candidates} 个候选，${result.evidence} 条证据`)
-    await load()
+    await load(scope)
   }
 
   const filtered = useMemo(() => {
     if (filter === "high") {
-      return trends.filter((t) => t.hotScore >= 70)
+      return trends.filter((trend) => trend.hotScore >= 70)
     }
     if (filter === "recent") {
       const cutoff = Date.now() - 24 * 60 * 60 * 1000
-      return trends.filter((t) => new Date(t.lastSeenAt).getTime() >= cutoff)
+      return trends.filter((trend) => new Date(trend.lastSeenAt).getTime() >= cutoff)
     }
     return trends
-  }, [trends, filter])
+  }, [filter, trends])
 
-  const highCount = useMemo(() => trends.filter((t) => t.hotScore >= 70).length, [trends])
+  const highCount = useMemo(() => trends.filter((trend) => trend.hotScore >= 70).length, [trends])
 
   const recentCount = useMemo(() => {
     const cutoff = Date.now() - 24 * 60 * 60 * 1000
-    return trends.filter((t) => new Date(t.lastSeenAt).getTime() >= cutoff).length
+    return trends.filter((trend) => new Date(trend.lastSeenAt).getTime() >= cutoff).length
   }, [trends])
 
   if (loading) {
@@ -73,13 +132,12 @@ export function TrendsPage() {
 
   return (
     <div className="trends-page">
-      {/* Scope input */}
       <form className="trends-filters" onSubmit={run}>
         <label className="trends-scope-label">
           <span>监控范围</span>
           <input
             value={scope}
-            onChange={(e) => setScope(e.target.value)}
+            onChange={(event) => setScope(event.target.value)}
             placeholder="输入关键词…"
           />
         </label>
@@ -90,21 +148,19 @@ export function TrendsPage() {
 
       {message && <div className="notice">{message}</div>}
 
-      {/* Filter pills */}
       <div className="trends-filters">
-        {FILTERS.map((f) => (
+        {FILTERS.map((item) => (
           <button
-            key={f.key}
+            key={item.key}
             type="button"
-            className={`filter-pill${filter === f.key ? " active" : ""}`}
-            onClick={() => setFilter(f.key)}
+            className={`filter-pill${filter === item.key ? " active" : ""}`}
+            onClick={() => setFilter(item.key)}
           >
-            {f.label}
+            {item.label}
           </button>
         ))}
       </div>
 
-      {/* Stats */}
       <div className="trends-stats">
         <div className="trends-stat">
           <div className="trends-stat-icon">
@@ -135,16 +191,13 @@ export function TrendsPage() {
         </div>
       </div>
 
-      {/* Card grid */}
       {filtered.length === 0 ? (
         <div className="trends-empty">
           <div className="trends-empty-icon">
             <Radar size={26} />
           </div>
           <p className="trends-empty-title">暂无趋势数据</p>
-          <p className="trends-empty-text">
-            请先点击「扫描趋势」来发现当前热点，或调整监控范围。
-          </p>
+          <p className="trends-empty-text">请先点击「扫描趋势」来发现当前热点，或调整监控范围。</p>
         </div>
       ) : (
         <div className="trends-grid">

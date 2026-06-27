@@ -23,7 +23,7 @@ export class DeepSeekClient {
 			messages: [
 				{
 					role: 'system',
-					content: 'You are an analysis engine. Return only valid JSON matching the requested schema.'
+					content: '你是一个分析引擎。请只返回符合请求 schema 的合法 JSON。'
 				},
 				{ role: 'user', content: prompt }
 			],
