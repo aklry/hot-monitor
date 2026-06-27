@@ -97,16 +97,34 @@ model TrendTopic {
   summary       String
   hotScore      Float
   growthScore   Float
+  status        String          @default("new")
   evidenceCount Int             @default(0)
   firstSeenAt   DateTime
   lastSeenAt    DateTime
   createdAt     DateTime        @default(now())
   evidences     TrendEvidence[]
+  snapshots     TrendSnapshot[]
   notifications Notification[]
 
   @@index([scope])
+  @@index([status])
   @@index([hotScore])
   @@index([lastSeenAt])
+}
+
+model TrendSnapshot {
+  id            String     @id @default(cuid())
+  trendTopicId  String
+  trendTopic    TrendTopic @relation(fields: [trendTopicId], references: [id], onDelete: Cascade)
+  hotScore      Float
+  growthScore   Float
+  evidenceCount Int
+  sourceCount   Int
+  status        String
+  capturedAt    DateTime   @default(now())
+
+  @@index([trendTopicId])
+  @@index([capturedAt])
 }
 
 model TrendEvidence {

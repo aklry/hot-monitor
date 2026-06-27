@@ -77,6 +77,9 @@ export function TrendDetailPage() {
               热度 {Math.round(trend.hotScore)}
             </div>
           )}
+          <div className={`trend-status-badge status-${trend.status ?? "watching"}`}>
+            {statusLabel(trend.status)}
+          </div>
           {trend.growthScore != null && (
             <div className="detail-meta-chip">
               <TrendingUp size={14} />
@@ -87,6 +90,18 @@ export function TrendDetailPage() {
             <div className="detail-meta-chip">
               <FileText size={14} />
               {trend.evidenceCount} 条证据
+            </div>
+          )}
+          {trend.snapshots?.length > 0 && (
+            <div className="detail-meta-chip">
+              <FileText size={14} />
+              {trend.snapshots.length} 次快照
+            </div>
+          )}
+          {formatDuration(trend.firstSeenAt, trend.lastSeenAt) && (
+            <div className="detail-meta-chip">
+              <Clock size={14} />
+              {formatDuration(trend.firstSeenAt, trend.lastSeenAt)}
             </div>
           )}
           {trend.lastSeenAt && (
@@ -134,4 +149,28 @@ function formatDate(value: string) {
     hour: "2-digit",
     minute: "2-digit"
   }).format(new Date(value))
+}
+
+function statusLabel(status?: TrendDetail["status"]) {
+  const labels = {
+    new: "新出现",
+    surging: "快速上升",
+    watching: "观察中",
+    cooling: "降温中"
+  }
+  return labels[status ?? "watching"]
+}
+
+function formatDuration(firstSeenAt?: string, lastSeenAt?: string) {
+  if (!firstSeenAt || !lastSeenAt) {
+    return ""
+  }
+
+  const diff = new Date(lastSeenAt).getTime() - new Date(firstSeenAt).getTime()
+  if (!Number.isFinite(diff) || diff < 0) {
+    return ""
+  }
+
+  const days = Math.max(1, Math.ceil(diff / 86_400_000))
+  return `持续 ${days} 天`
 }

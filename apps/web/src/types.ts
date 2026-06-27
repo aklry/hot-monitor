@@ -23,13 +23,27 @@ export interface TrendTopic {
   summary: string
   hotScore: number
   growthScore: number
+  status?: "new" | "surging" | "watching" | "cooling"
   evidenceCount: number
+  firstSeenAt?: string
   lastSeenAt: string
+  snapshots?: TrendSnapshot[]
 }
 
 export interface TrendDetail extends TrendTopic {
   firstSeenAt: string
+  snapshots: TrendSnapshot[]
   evidences: TrendEvidence[]
+}
+
+export interface TrendSnapshot {
+  id: string
+  hotScore?: number
+  growthScore?: number
+  evidenceCount?: number
+  sourceCount?: number
+  status?: string
+  capturedAt?: string
 }
 
 export interface TrendEvidence {

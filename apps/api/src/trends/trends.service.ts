@@ -3,6 +3,7 @@ import { TrendAnalysisService } from "../ai/trend-analysis.service"
 import { PrismaService } from "../database/prisma.service"
 import { SourcesService } from "../sources/sources.service"
 import { candidateHash } from "../sources/source-normalizer"
+import { findMatchingTrend, resolveTrendStatus } from "./trend-lifecycle"
 import { filterCurrentTrendCandidates } from "./trend-recency"
 import { calculateTrendScore } from "./trend-score"
 
@@ -18,7 +19,13 @@ export class TrendsService {
     return this.prisma.trendTopic.findMany({
       where: scope ? { scope } : undefined,
       orderBy: [{ hotScore: "desc" }, { lastSeenAt: "desc" }],
-      take: 50
+      take: 50,
+      include: {
+        snapshots: {
+          orderBy: { capturedAt: "desc" },
+          take: 1
+        }
+      }
     })
   }
 
@@ -26,6 +33,9 @@ export class TrendsService {
     const trend = await this.prisma.trendTopic.findUnique({
       where: { id },
       include: {
+        snapshots: {
+          orderBy: { capturedAt: "asc" }
+        },
         evidences: {
           include: { item: { include: { source: true } } }
         }
@@ -37,9 +47,8 @@ export class TrendsService {
     return trend
   }
 
-  async runNow(scope: string) {
+  async runNow(scope: string, now = new Date()) {
     const candidates = await this.sources.searchAll(scope)
-    const now = new Date()
     const current = filterCurrentTrendCandidates(candidates, now)
     const limited = current.candidates.slice(0, 30)
 
@@ -95,7 +104,61 @@ export class TrendsService {
       averageSourceWeight: 50,
       newestItemAgeHours
     })
+    const sourceCount = new Set(limited.map((item) => item.sourceName)).size
 
+    const existingTrends = await this.prisma.trendTopic.findMany({
+      where: { scope },
+      orderBy: { lastSeenAt: "desc" },
+      take: 50
+    })
+    const matchingTrend = findMatchingTrend(existingTrends, analysis.title)
+    const evidenceRows = items.slice(0, 10).map((item) => ({
+      itemId: item.id,
+      sourceWeight: 50,
+      aiReason:
+        analysis.evidence.find((evidence) => evidence.itemUrl === item.url)?.reason ??
+        analysis.whyNow
+    }))
+
+    if (matchingTrend) {
+      const status = resolveTrendStatus({
+        previousHotScore: matchingTrend.hotScore,
+        hotScore,
+        growthScore: analysis.growthScore,
+        firstSeenAt: matchingTrend.firstSeenAt,
+        lastSeenAt: matchingTrend.lastSeenAt,
+        now
+      })
+      await this.upsertEvidenceRows(matchingTrend.id, evidenceRows)
+      const evidenceCount = await this.prisma.trendEvidence.count({
+        where: { trendTopicId: matchingTrend.id }
+      })
+      const trend = await this.prisma.trendTopic.update({
+        where: { id: matchingTrend.id },
+        data: {
+          title: analysis.title,
+          summary: analysis.summary,
+          hotScore,
+          growthScore: analysis.growthScore,
+          status,
+          evidenceCount,
+          lastSeenAt: now
+        },
+        include: { evidences: true }
+      })
+
+      await this.createSnapshot(matchingTrend.id, hotScore, analysis.growthScore, items.length, sourceCount, status, now)
+
+      return { trend, candidates: candidates.length, evidence: items.length, merged: true }
+    }
+
+    const status = resolveTrendStatus({
+      hotScore,
+      growthScore: analysis.growthScore,
+      firstSeenAt: newest,
+      lastSeenAt: now,
+      now
+    })
     const trend = await this.prisma.trendTopic.create({
       data: {
         scope,
@@ -103,22 +166,67 @@ export class TrendsService {
         summary: analysis.summary,
         hotScore,
         growthScore: analysis.growthScore,
+        status,
         evidenceCount: items.length,
         firstSeenAt: newest,
         lastSeenAt: now,
         evidences: {
-          create: items.slice(0, 10).map((item) => ({
-            itemId: item.id,
-            sourceWeight: 50,
-            aiReason:
-              analysis.evidence.find((evidence) => evidence.itemUrl === item.url)?.reason ??
-              analysis.whyNow
-          }))
+          create: evidenceRows
         }
       },
       include: { evidences: true }
     })
 
-    return { trend, candidates: candidates.length, evidence: items.length }
+    await this.createSnapshot(trend.id, hotScore, analysis.growthScore, items.length, sourceCount, status, now)
+
+    return { trend, candidates: candidates.length, evidence: items.length, merged: false }
+  }
+
+  private createSnapshot(
+    trendTopicId: string,
+    hotScore: number,
+    growthScore: number,
+    evidenceCount: number,
+    sourceCount: number,
+    status: string,
+    capturedAt: Date
+  ) {
+    return this.prisma.trendSnapshot.create({
+      data: {
+        trendTopicId,
+        hotScore,
+        growthScore,
+        evidenceCount,
+        sourceCount,
+        status,
+        capturedAt
+      }
+    })
+  }
+
+  private async upsertEvidenceRows(
+    trendTopicId: string,
+    rows: Array<{ itemId: string; sourceWeight: number; aiReason: string }>
+  ) {
+    for (const row of rows) {
+      await this.prisma.trendEvidence.upsert({
+        where: {
+          trendTopicId_itemId: {
+            trendTopicId,
+            itemId: row.itemId
+          }
+        },
+        update: {
+          sourceWeight: row.sourceWeight,
+          aiReason: row.aiReason
+        },
+        create: {
+          trendTopicId,
+          itemId: row.itemId,
+          sourceWeight: row.sourceWeight,
+          aiReason: row.aiReason
+        }
+      })
+    }
   }
 }

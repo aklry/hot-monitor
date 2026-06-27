@@ -12,7 +12,10 @@ const trend = {
   summary: "Developers are adopting agentic coding tools across daily work.",
   hotScore: 87,
   growthScore: 42,
+  status: "watching",
   evidenceCount: 2,
+  firstSeenAt: "2026-06-22T08:00:00.000Z",
+  snapshots: [{ id: "snapshot-1" }],
   lastSeenAt: "2026-06-23T08:00:00.000Z"
 }
 
@@ -23,7 +26,10 @@ const searchedTrend = {
   summary: "Security review is being folded into agent-assisted development loops.",
   hotScore: 91,
   growthScore: 55,
+  status: "surging",
   evidenceCount: 3,
+  firstSeenAt: "2026-06-23T08:00:00.000Z",
+  snapshots: [{ id: "snapshot-2" }, { id: "snapshot-3" }],
   lastSeenAt: "2026-06-24T08:00:00.000Z"
 }
 
@@ -106,6 +112,7 @@ describe("Radar trends", () => {
     await user.click(await screen.findByRole("link", { name: /AI agents reshape developer workflows/i }))
 
     expect(await screen.findByRole("heading", { name: /AI agents reshape developer workflows/i })).toBeInTheDocument()
+    expect(screen.getByText("观察中")).toBeInTheDocument()
     expect(screen.getByText(/Multiple developer tool launches/i)).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /Agent tools move into IDEs/i })).toHaveAttribute(
       "href",
@@ -131,6 +138,8 @@ describe("Radar trends", () => {
     await user.click(screen.getByRole("button", { name: "扫描趋势" }))
 
     expect(await screen.findByRole("link", { name: /Security teams adopt agentic review workflows/i })).toBeInTheDocument()
+    expect(screen.getByText("快速上升")).toBeInTheDocument()
+    expect(screen.getByText("2 次快照")).toBeInTheDocument()
 
     await user.click(screen.getByRole("link", { name: /Security teams adopt agentic review workflows/i }))
     await user.click(await screen.findByRole("link", { name: "返回趋势列表" }))

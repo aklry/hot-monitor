@@ -64,6 +64,30 @@ function formatRelativeTime(dateStr?: string): string {
   return `${days} 天前`
 }
 
+function statusLabel(status?: TrendTopic["status"]) {
+  const labels = {
+    new: "新出现",
+    surging: "快速上升",
+    watching: "观察中",
+    cooling: "降温中"
+  }
+  return labels[status ?? "watching"]
+}
+
+function formatDuration(firstSeenAt?: string, lastSeenAt?: string) {
+  if (!firstSeenAt || !lastSeenAt) {
+    return ""
+  }
+
+  const diff = new Date(lastSeenAt).getTime() - new Date(firstSeenAt).getTime()
+  if (!Number.isFinite(diff) || diff < 0) {
+    return ""
+  }
+
+  const days = Math.max(1, Math.ceil(diff / 86_400_000))
+  return `持续 ${days} 天`
+}
+
 export function TrendsPage() {
   const storedState = readStoredState()
   const [scope, setScope] = useState(storedState?.scope ?? DEFAULT_SCOPE)
@@ -211,10 +235,19 @@ export function TrendsPage() {
               {trend.summary && <p className="trend-card-summary">{trend.summary}</p>}
 
               <div className="trend-card-meta">
+                <span className={`trend-status-badge status-${trend.status ?? "watching"}`}>
+                  {statusLabel(trend.status)}
+                </span>
                 <span className="detail-meta-chip">
                   <TrendingUp size={12} /> 增长 {Math.round(trend.growthScore)}
                 </span>
                 <span className="source-badge">{trend.evidenceCount} 条证据</span>
+                {trend.snapshots && trend.snapshots.length > 0 && (
+                  <span className="source-badge">{trend.snapshots.length} 次快照</span>
+                )}
+                {formatDuration(trend.firstSeenAt, trend.lastSeenAt) && (
+                  <span className="time-label">{formatDuration(trend.firstSeenAt, trend.lastSeenAt)}</span>
+                )}
                 <span className="time-label">{formatRelativeTime(trend.lastSeenAt)}</span>
               </div>
             </Link>
