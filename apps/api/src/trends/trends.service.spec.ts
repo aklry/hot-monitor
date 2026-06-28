@@ -100,17 +100,20 @@ describe("TrendsService", () => {
     }
     const trendAnalysis = {
       analyzeTrend: jest.fn().mockResolvedValue({
-        title: "AI agent tools reshape developer workflows",
-        summary: "Developers are adopting agentic coding tools across daily work.",
-        hotScore: 95,
-        growthScore: 61,
-        whyNow: "Fresh coverage from developer tooling sources.",
-        evidence: [
-          {
-            itemUrl: "https://example.com/agent-tools",
-            reason: "New evidence confirms acceleration."
-          }
-        ]
+        analysis: {
+          title: "AI agent tools reshape developer workflows",
+          summary: "Developers are adopting agentic coding tools across daily work.",
+          hotScore: 95,
+          growthScore: 61,
+          whyNow: "Fresh coverage from developer tooling sources.",
+          evidence: [
+            {
+              itemUrl: "https://example.com/agent-tools",
+              reason: "New evidence confirms acceleration."
+            }
+          ]
+        },
+        usage: { promptTokens: 200, completionTokens: 100, totalTokens: 300 }
       })
     }
     const service = new TrendsService(prisma as never, sources as never, trendAnalysis as never)

@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common"
+import { Injectable, Logger, NotFoundException } from "@nestjs/common"
 import { CreateMonitorSchema, UpdateMonitorSchema } from "@hots-monitor/shared"
 import type { CreateMonitorInput, UpdateMonitorInput } from "@hots-monitor/shared"
 import { ContentAnalysisService } from "../ai/content-analysis.service"
+import { AiUsageService } from "../ai/ai-usage.service"
 import { PrismaService } from "../database/prisma.service"
 import { NotificationBatchService } from "../notifications/notification-batch.service"
 import { NotificationsService } from "../notifications/notifications.service"
@@ -11,12 +12,15 @@ import { shouldNotifyKeywordHit, shouldNotifyRiskAlert } from "./monitor-thresho
 
 @Injectable()
 export class MonitorsService {
+  private readonly logger = new Logger(MonitorsService.name)
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly sources: SourcesService,
     private readonly contentAnalysis: ContentAnalysisService,
     private readonly notifications: NotificationsService,
-    private readonly batchService: NotificationBatchService
+    private readonly batchService: NotificationBatchService,
+    private readonly aiUsage: AiUsageService
   ) {}
 
   list() {
@@ -45,9 +49,16 @@ export class MonitorsService {
 
     const candidates = await this.sources.searchAll(`${monitor.keyword} ${monitor.scope}`)
     let analyzed = 0
+    let skipped = 0
     let notifications = 0
+    let totalTokens = 0
 
     for (const candidate of candidates.slice(0, 25)) {
+      if (!matchesKeyword(candidate.title, candidate.summary, monitor.keyword)) {
+        skipped += 1
+        continue
+      }
+
       const hash = candidateHash(candidate.title, candidate.url)
       const item = await this.prisma.collectedItem.upsert({
         where: { hash },
@@ -79,7 +90,44 @@ export class MonitorsService {
         }
       })
 
-      const analysis = await this.contentAnalysis.analyzeKeyword({
+      const cached = await this.prisma.aiAnalysis.findFirst({
+        where: {
+          itemId: item.id,
+          keywordId: monitor.id,
+          taskType: "keyword_monitor"
+        },
+        orderBy: { createdAt: "desc" }
+      })
+      if (cached) {
+        const analysis = JSON.parse(cached.rawJson)
+        if (shouldNotifyRiskAlert(analysis)) {
+          await this.createRiskNotifications(
+            item.id,
+            monitor.keyword,
+            analysis.topic,
+            analysis.reason
+          )
+          notifications += 1
+        } else if (shouldNotifyKeywordHit(analysis)) {
+          await this.batchService.bufferHit(
+            monitor.id,
+            monitor.keyword,
+            item.id,
+            analysis.topic,
+            analysis.reason
+          )
+          notifications += 1
+        }
+        analyzed += 1
+        continue
+      }
+
+      if (!(await this.aiUsage.isWithinBudget())) {
+        this.logger.warn("AI daily token budget exhausted, skipping remaining candidates")
+        break
+      }
+
+      const { analysis, usage } = await this.contentAnalysis.analyzeKeyword({
         keyword: monitor.keyword,
         scope: monitor.scope,
         title: candidate.title,
@@ -88,6 +136,7 @@ export class MonitorsService {
         content: candidate.content
       })
       analyzed += 1
+      totalTokens += usage.totalTokens
 
       await this.prisma.aiAnalysis.create({
         data: {
@@ -101,7 +150,10 @@ export class MonitorsService {
           riskLevel: analysis.riskLevel,
           topic: analysis.topic,
           reason: analysis.reason,
-          rawJson: JSON.stringify(analysis)
+          rawJson: JSON.stringify(analysis),
+          promptTokens: usage.promptTokens,
+          completionTokens: usage.completionTokens,
+          totalTokens: usage.totalTokens
         }
       })
 
@@ -130,7 +182,7 @@ export class MonitorsService {
       data: { lastCheckedAt: new Date() }
     })
 
-    return { candidates: candidates.length, analyzed, notifications }
+    return { candidates: candidates.length, analyzed, skipped, notifications, totalTokens }
   }
 
   private async createRiskNotifications(
@@ -166,4 +218,11 @@ export class MonitorsService {
       })
     ])
   }
+}
+
+function matchesKeyword(title: string, summary: string | undefined, keyword: string): boolean {
+  const lowerKeyword = keyword.toLowerCase()
+  const lowerTitle = title.toLowerCase()
+  const lowerSummary = (summary ?? "").toLowerCase()
+  return lowerTitle.includes(lowerKeyword) || lowerSummary.includes(lowerKeyword)
 }

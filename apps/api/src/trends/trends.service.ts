@@ -56,7 +56,7 @@ export class TrendsService {
       return { trend: null, candidates: candidates.length, evidence: 0 }
     }
 
-    const analysis = await this.trendAnalysis.analyzeTrend(scope, limited, now)
+    const { analysis } = await this.trendAnalysis.analyzeTrend(scope, limited, now)
 
     const items = []
     for (const candidate of limited) {

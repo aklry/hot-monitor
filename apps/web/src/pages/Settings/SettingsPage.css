@@ -33,6 +33,73 @@
   padding: 1rem;
 }
 
+/* ── AI Cost Control Section ───────────────────────────── */
+
+.settings-section {
+  grid-column: 1 / -1;
+  border: 1px solid rgba(34, 51, 47, 0.6);
+  border-radius: 8px;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.settings-section legend {
+  padding: 0 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.token-usage {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.usage-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.usage-total {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.usage-bar-track {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(34, 51, 47, 0.6);
+  overflow: hidden;
+}
+
+.usage-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: rgba(101, 214, 181, 0.7);
+  transition: width 300ms ease;
+}
+
+.usage-bar-fill[data-warning="true"] {
+  background: rgba(255, 183, 77, 0.8);
+}
+
+.usage-detail {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
 /* Responsive */
 @media (max-width: 960px) {
   .settings-grid {

@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Patch, Post } from "@nestjs/common"
+import { AiUsageService } from "../ai/ai-usage.service"
 import { ContentAnalysisService } from "../ai/content-analysis.service"
 import { MailerService } from "../notifications/mailer.service"
 import { SettingsService } from "./settings.service"
@@ -8,12 +9,18 @@ export class SettingsController {
   constructor(
     private readonly settings: SettingsService,
     private readonly ai: ContentAnalysisService,
+    private readonly usage: AiUsageService,
     private readonly mailer: MailerService
   ) {}
 
   @Get()
-  list() {
-    return this.settings.list()
+  async list() {
+    const [settings, dailyUsage, dailyBudget] = await Promise.all([
+      this.settings.list(),
+      this.usage.getDailyUsage(),
+      this.usage.getDailyBudget()
+    ])
+    return { ...settings, _dailyUsage: dailyUsage, _dailyBudget: dailyBudget }
   }
 
   @Patch()
@@ -23,14 +30,14 @@ export class SettingsController {
 
   @Post("test-ai")
   async testAi() {
-    const result = await this.ai.analyzeKeyword({
+    const { analysis, usage } = await this.ai.analyzeKeyword({
       keyword: "AI coding",
       scope: "developer tools",
       title: "AI coding agent launches",
       url: "https://example.com",
       summary: "A test item for AI connectivity."
     })
-    return { ok: true, result }
+    return { ok: true, result: analysis, usage }
   }
 
   @Post("test-email")

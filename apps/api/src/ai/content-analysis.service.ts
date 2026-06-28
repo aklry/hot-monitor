@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { KeywordAnalysisSchema, type ParsedKeywordAnalysis } from "@hots-monitor/shared"
 import { parseAiJson } from "./ai-json-parser"
+import type { CompletionResult } from "./deepseek.client"
 import { DeepSeekClient } from "./deepseek.client"
 
 export interface KeywordAnalysisInput {
@@ -12,11 +13,16 @@ export interface KeywordAnalysisInput {
   content?: string
 }
 
+export interface KeywordAnalysisResult {
+  analysis: ParsedKeywordAnalysis
+  usage: Omit<CompletionResult, "content">
+}
+
 @Injectable()
 export class ContentAnalysisService {
   constructor(private readonly deepSeek: DeepSeekClient) {}
 
-  async analyzeKeyword(input: KeywordAnalysisInput): Promise<ParsedKeywordAnalysis> {
+  async analyzeKeyword(input: KeywordAnalysisInput): Promise<KeywordAnalysisResult> {
     const prompt = [
       "请分析该条目是否真正与监控关键词和范围相关。",
       "请识别是否存在冒充、误导性命名、标题党或虚假关联。",
@@ -32,7 +38,14 @@ export class ContentAnalysisService {
       `正文：${input.content ?? ""}`
     ].join("\n")
 
-    const raw = await this.deepSeek.completeJson(prompt)
-    return parseAiJson(raw, KeywordAnalysisSchema)
+    const result = await this.deepSeek.completeJson(prompt)
+    return {
+      analysis: parseAiJson(result.content, KeywordAnalysisSchema),
+      usage: {
+        promptTokens: result.promptTokens,
+        completionTokens: result.completionTokens,
+        totalTokens: result.totalTokens
+      }
+    }
   }
 }

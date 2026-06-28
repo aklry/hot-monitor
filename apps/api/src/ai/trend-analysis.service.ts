@@ -6,6 +6,7 @@ import {
 } from "@hots-monitor/shared"
 import { z } from "zod"
 import { parseAiJson } from "./ai-json-parser"
+import type { CompletionResult } from "./deepseek.client"
 import { DeepSeekClient } from "./deepseek.client"
 
 function createTrendAnalysisResponseSchema(items: CollectedCandidate[]) {
@@ -45,7 +46,7 @@ export class TrendAnalysisService {
     scope: string,
     items: CollectedCandidate[],
     now = new Date()
-  ): Promise<TrendAnalysis> {
+  ): Promise<{ analysis: TrendAnalysis; usage: Omit<CompletionResult, "content"> }> {
     const evidence = items
       .slice(0, 20)
       .map(
@@ -66,7 +67,14 @@ export class TrendAnalysisService {
       evidence
     ].join("\n")
 
-    const raw = await this.deepSeek.completeJson(prompt, { strict: true })
-    return parseAiJson(raw, createTrendAnalysisResponseSchema(items))
+    const result = await this.deepSeek.completeJson(prompt, { strict: true })
+    return {
+      analysis: parseAiJson(result.content, createTrendAnalysisResponseSchema(items)),
+      usage: {
+        promptTokens: result.promptTokens,
+        completionTokens: result.completionTokens,
+        totalTokens: result.totalTokens
+      }
+    }
   }
 }

@@ -83,11 +83,15 @@ model AiAnalysis {
   topic           String?
   reason          String
   rawJson         String
+  promptTokens    Int             @default(0)
+  completionTokens Int            @default(0)
+  totalTokens     Int             @default(0)
   createdAt       DateTime        @default(now())
 
   @@index([taskType])
   @@index([keywordId])
   @@index([itemId])
+  @@index([createdAt])
 }
 
 model TrendTopic {

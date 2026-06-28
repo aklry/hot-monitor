@@ -2,6 +2,13 @@ import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import OpenAI from "openai"
 
+export interface CompletionResult {
+  content: string
+  promptTokens: number
+  completionTokens: number
+  totalTokens: number
+}
+
 @Injectable()
 export class DeepSeekClient {
   private readonly client: OpenAI
@@ -13,7 +20,7 @@ export class DeepSeekClient {
     })
   }
 
-  async completeJson(prompt: string, options?: { strict?: boolean }): Promise<string> {
+  async completeJson(prompt: string, options?: { strict?: boolean }): Promise<CompletionResult> {
     const model = options?.strict
       ? this.config.get<string>("DEEPSEEK_STRICT_MODEL")
       : this.config.get<string>("DEEPSEEK_MODEL")
@@ -30,6 +37,12 @@ export class DeepSeekClient {
       temperature: 0.2
     })
 
-    return completion.choices[0]?.message?.content ?? "{}"
+    const usage = completion.usage
+    return {
+      content: completion.choices[0]?.message?.content ?? "{}",
+      promptTokens: usage?.prompt_tokens ?? 0,
+      completionTokens: usage?.completion_tokens ?? 0,
+      totalTokens: usage?.total_tokens ?? 0
+    }
   }
 }
