@@ -18,3 +18,16 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
+
+.notifications-page .batch-summary {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+  list-style: decimal;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.notifications-page .batch-summary li {
+  margin-bottom: 0.125rem;
+}

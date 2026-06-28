@@ -151,6 +151,7 @@ model Notification {
   relatedItem    CollectedItem? @relation(fields: [relatedItemId], references: [id], onDelete: SetNull)
   relatedTrendId String?
   relatedTrend   TrendTopic?    @relation(fields: [relatedTrendId], references: [id], onDelete: SetNull)
+  batchId        String?
   createdAt      DateTime       @default(now())
   sentAt         DateTime?
   error          String?
@@ -158,4 +159,5 @@ model Notification {
   @@index([channel])
   @@index([status])
   @@index([createdAt])
+  @@index([batchId])
 }

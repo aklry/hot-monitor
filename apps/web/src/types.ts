@@ -91,5 +91,6 @@ export interface NotificationRecord {
   status: string
   createdAt: string
   error?: string
+  batchId?: string
   relatedItem?: NotificationItem | null
 }

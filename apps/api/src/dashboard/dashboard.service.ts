@@ -13,7 +13,11 @@ export class DashboardService {
       await Promise.all([
         this.prisma.monitorKeyword.count({ where: { enabled: true } }),
         this.prisma.notification.count({
-          where: { type: "keyword_hit", createdAt: { gte: startOfDay } }
+          where: {
+            type: "keyword_hit",
+            status: { not: "buffered" },
+            createdAt: { gte: startOfDay }
+          }
         }),
         this.prisma.notification.count({
           where: { type: "risk_alert", status: { not: "read" } }
@@ -23,6 +27,7 @@ export class DashboardService {
           take: 5
         }),
         this.prisma.notification.findMany({
+          where: { status: { not: "buffered" } },
           orderBy: { createdAt: "desc" },
           take: 10,
           include: {

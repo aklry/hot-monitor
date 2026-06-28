@@ -3,6 +3,7 @@ import { CreateMonitorSchema, UpdateMonitorSchema } from "@hots-monitor/shared"
 import type { CreateMonitorInput, UpdateMonitorInput } from "@hots-monitor/shared"
 import { ContentAnalysisService } from "../ai/content-analysis.service"
 import { PrismaService } from "../database/prisma.service"
+import { NotificationBatchService } from "../notifications/notification-batch.service"
 import { NotificationsService } from "../notifications/notifications.service"
 import { SourcesService } from "../sources/sources.service"
 import { candidateHash } from "../sources/source-normalizer"
@@ -14,7 +15,8 @@ export class MonitorsService {
     private readonly prisma: PrismaService,
     private readonly sources: SourcesService,
     private readonly contentAnalysis: ContentAnalysisService,
-    private readonly notifications: NotificationsService
+    private readonly notifications: NotificationsService,
+    private readonly batchService: NotificationBatchService
   ) {}
 
   list() {
@@ -103,13 +105,19 @@ export class MonitorsService {
         }
       })
 
-      if (shouldNotifyKeywordHit(analysis)) {
-        await this.createHitNotifications(item.id, monitor.keyword, analysis.topic, analysis.reason)
-        notifications += 1
-      } else if (shouldNotifyRiskAlert(analysis)) {
+      if (shouldNotifyRiskAlert(analysis)) {
         await this.createRiskNotifications(
           item.id,
           monitor.keyword,
+          analysis.topic,
+          analysis.reason
+        )
+        notifications += 1
+      } else if (shouldNotifyKeywordHit(analysis)) {
+        await this.batchService.bufferHit(
+          monitor.id,
+          monitor.keyword,
+          item.id,
           analysis.topic,
           analysis.reason
         )
@@ -123,40 +131,6 @@ export class MonitorsService {
     })
 
     return { candidates: candidates.length, analyzed, notifications }
-  }
-
-  private async createHitNotifications(
-    itemId: string,
-    keyword: string,
-    topic: string,
-    reason: string
-  ) {
-    await Promise.all([
-      this.notifications.create({
-        type: "keyword_hit",
-        title: `Keyword hit: ${keyword}`,
-        message: `${topic}: ${reason}`,
-        channel: "in_app",
-        status: "sent",
-        relatedItemId: itemId
-      }),
-      this.notifications.create({
-        type: "keyword_hit",
-        title: `Keyword hit: ${keyword}`,
-        message: `${topic}: ${reason}`,
-        channel: "browser",
-        status: "pending",
-        relatedItemId: itemId
-      }),
-      this.notifications.create({
-        type: "keyword_hit",
-        title: `Keyword hit: ${keyword}`,
-        message: `${topic}: ${reason}`,
-        channel: "email",
-        status: "pending",
-        relatedItemId: itemId
-      })
-    ])
   }
 
   private async createRiskNotifications(

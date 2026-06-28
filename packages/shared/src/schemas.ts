@@ -15,7 +15,7 @@ const aiRiskLevel = z.preprocess(
 export const RiskLevelSchema = aiRiskLevel
 export const UrgencySchema = z.enum(["low", "medium", "high"])
 export const NotificationChannelSchema = z.enum(["in_app", "browser", "email"])
-export const NotificationStatusSchema = z.enum(["pending", "sent", "failed", "read"])
+export const NotificationStatusSchema = z.enum(["pending", "sent", "failed", "read", "buffered"])
 
 const aiNumber = (schema: z.ZodNumber, fallback: number) =>
   z.preprocess((value) => {

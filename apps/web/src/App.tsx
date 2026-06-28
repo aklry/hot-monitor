@@ -35,6 +35,9 @@ export function App() {
 
     stream.onmessage = (event) => {
       const payload = JSON.parse(event.data) as NotificationRecord
+      if (payload.status === "buffered") {
+        return
+      }
       setSignalCount((count) => count + 1)
       if (
         payload.channel === "browser" &&

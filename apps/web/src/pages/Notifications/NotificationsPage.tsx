@@ -3,6 +3,10 @@ import { apiGet, apiPatch, apiPost } from "$/api/client"
 import type { NotificationRecord } from "$/types"
 import "./NotificationsPage.css"
 
+function isBatchAggregate(item: NotificationRecord) {
+  return item.batchId && item.message.includes("\n")
+}
+
 export function NotificationsPage() {
   const [items, setItems] = useState<NotificationRecord[]>([])
   const load = () => apiGet<NotificationRecord[]>("/notifications").then(setItems)
@@ -18,7 +22,15 @@ export function NotificationsPage() {
           <article key={item.id} className="record-row">
             <div>
               <strong>{item.title}</strong>
-              <p>{item.message}</p>
+              {isBatchAggregate(item) ? (
+                <ul className="batch-summary">
+                  {item.message.split("\n").map((line) => (
+                    <li key={line}>{line.replace(/^\d+\.\s*/, "")}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>{item.message}</p>
+              )}
               {item.relatedItem && (
                 <a
                   className="article-link"

@@ -2,6 +2,7 @@ import { Injectable, Logger } from "@nestjs/common"
 import { Cron, CronExpression } from "@nestjs/schedule"
 import { PrismaService } from "../database/prisma.service"
 import { MonitorsService } from "../monitors/monitors.service"
+import { NotificationBatchService } from "../notifications/notification-batch.service"
 import { SettingsService } from "../settings/settings.service"
 import { TrendsService } from "../trends/trends.service"
 
@@ -14,13 +15,15 @@ export class JobsService {
     private readonly prisma: PrismaService,
     private readonly monitors: MonitorsService,
     private readonly trends: TrendsService,
-    private readonly settings: SettingsService
+    private readonly settings: SettingsService,
+    private readonly batchService: NotificationBatchService
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
   async tick() {
     await this.runDueMonitors()
     await this.runDueTrendDiscovery()
+    await this.flushDueBatches()
   }
 
   private async runDueMonitors() {
@@ -41,6 +44,14 @@ export class JobsService {
       } catch (error) {
         this.logger.error(`Monitor ${monitor.id} failed: ${(error as Error).message}`)
       }
+    }
+  }
+
+  private async flushDueBatches() {
+    try {
+      await this.batchService.flushDueBatches()
+    } catch (error) {
+      this.logger.error(`Batch flush failed: ${(error as Error).message}`)
     }
   }
 

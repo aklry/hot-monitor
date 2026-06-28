@@ -12,6 +12,7 @@ export interface CreateNotificationInput {
   target?: string
   relatedItemId?: string
   relatedTrendId?: string
+  batchId?: string
 }
 
 @Injectable()
@@ -33,7 +34,8 @@ export class NotificationsService {
         status: input.status ?? "pending",
         target: input.target,
         relatedItemId: input.relatedItemId,
-        relatedTrendId: input.relatedTrendId
+        relatedTrendId: input.relatedTrendId,
+        batchId: input.batchId
       },
       include: {
         relatedItem: true
@@ -45,6 +47,7 @@ export class NotificationsService {
 
   list() {
     return this.prisma.notification.findMany({
+      where: { status: { not: "buffered" } },
       orderBy: { createdAt: "desc" },
       take: 100,
       include: {
@@ -62,6 +65,22 @@ export class NotificationsService {
 
   streamEvents() {
     return this.stream.asObservable()
+  }
+
+  emitBrowserNotification(payload: {
+    type: string
+    title: string
+    message: string
+    relatedItemId?: string
+  }) {
+    this.stream.next({
+      data: {
+        id: `browser-${Date.now()}`,
+        ...payload,
+        channel: "browser",
+        status: "pending"
+      }
+    } as MessageEvent)
   }
 
   async retry(id: string) {
