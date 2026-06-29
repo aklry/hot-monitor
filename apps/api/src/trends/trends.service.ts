@@ -56,7 +56,7 @@ export class TrendsService {
       return { trend: null, candidates: candidates.length, evidence: 0 }
     }
 
-    const { analysis } = await this.trendAnalysis.analyzeTrend(scope, limited, now)
+    const { analysis, usage } = await this.trendAnalysis.analyzeTrend(scope, limited, now)
 
     const items = []
     for (const candidate of limited) {
@@ -119,6 +119,24 @@ export class TrendsService {
         analysis.evidence.find((evidence) => evidence.itemUrl === item.url)?.reason ??
         analysis.whyNow
     }))
+
+    await this.prisma.aiAnalysis.create({
+      data: {
+        itemId: items[0].id,
+        taskType: "trend_discovery",
+        model: "deepseek",
+        isRelevant: true,
+        confidence: 1,
+        hotScore: analysis.hotScore,
+        riskLevel: "low",
+        topic: analysis.title,
+        reason: analysis.whyNow,
+        rawJson: JSON.stringify(analysis),
+        promptTokens: usage.promptTokens,
+        completionTokens: usage.completionTokens,
+        totalTokens: usage.totalTokens
+      }
+    })
 
     if (matchingTrend) {
       const status = resolveTrendStatus({

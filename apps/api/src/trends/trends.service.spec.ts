@@ -76,6 +76,7 @@ describe("TrendsService", () => {
       lastSeenAt: now
     }
     const prisma = {
+      aiAnalysis: { create: jest.fn() },
       collectedItem: { upsert: jest.fn().mockResolvedValue(item) },
       trendTopic: {
         create: jest.fn(),
@@ -154,6 +155,35 @@ describe("TrendsService", () => {
         itemId: item.id,
         sourceWeight: 50,
         aiReason: "New evidence confirms acceleration."
+      }
+    })
+    expect(prisma.aiAnalysis.create).toHaveBeenCalledWith({
+      data: {
+        itemId: item.id,
+        taskType: "trend_discovery",
+        model: "deepseek",
+        isRelevant: true,
+        confidence: 1,
+        hotScore: 95,
+        riskLevel: "low",
+        topic: "AI agent tools reshape developer workflows",
+        reason: "Fresh coverage from developer tooling sources.",
+        rawJson: JSON.stringify({
+          title: "AI agent tools reshape developer workflows",
+          summary: "Developers are adopting agentic coding tools across daily work.",
+          hotScore: 95,
+          growthScore: 61,
+          whyNow: "Fresh coverage from developer tooling sources.",
+          evidence: [
+            {
+              itemUrl: "https://example.com/agent-tools",
+              reason: "New evidence confirms acceleration."
+            }
+          ]
+        }),
+        promptTokens: 200,
+        completionTokens: 100,
+        totalTokens: 300
       }
     })
     expect(prisma.trendSnapshot.create).toHaveBeenCalledWith({
