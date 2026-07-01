@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hots-monitor-api
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    volumes:
+      - hots-data:/app/data
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/prod.db
+      - API_PORT=4000
+      - WEB_ORIGIN=http://localhost
+      # DeepSeek AI Configuration
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - DEEPSEEK_BASE_URL=${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+      - DEEPSEEK_MODEL=${DEEPSEEK_MODEL:-deepseek-v4-flash}
+      - DEEPSEEK_STRICT_MODEL=${DEEPSEEK_STRICT_MODEL:-deepseek-v4-pro}
+      # RSSHub Configuration
+      - RSSHUB_BASE_URL=${RSSHUB_BASE_URL:-http://rsshub:1200}
+      - X_BEARER_TOKEN=${X_BEARER_TOKEN}
+      # SMTP Configuration
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_FROM=${SMTP_FROM}
+      - SMTP_TO=${SMTP_TO}
+      # Scheduler Intervals
+      - KEYWORD_INTERVAL_MINUTES=${KEYWORD_INTERVAL_MINUTES:-10}
+      - TRENDS_INTERVAL_MINUTES=${TRENDS_INTERVAL_MINUTES:-60}
+    networks:
+      - hots-network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: hots-monitor-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - hots-network
+
+  # Optional: RSSHub for RSS feeds
+  rsshub:
+    image: diygod/rsshub:latest
+    container_name: hots-monitor-rsshub
+    restart: unless-stopped
+    ports:
+      - "1200:1200"
+    environment:
+      - NODE_ENV=production
+      - CACHE_TYPE=memory
+      - REQUEST_TIMEOUT=10000
+    networks:
+      - hots-network
+
+volumes:
+  hots-data:
+    driver: local
+
+networks:
+  hots-network:
+    driver: bridge

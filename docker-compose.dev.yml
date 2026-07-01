@@ -1,0 +1,22 @@
+# Development Docker Compose
+# Use this for local development with hot-reload
+
+version: '3.8'
+
+services:
+  rsshub:
+    image: diygod/rsshub:latest
+    container_name: hots-monitor-rsshub-dev
+    restart: unless-stopped
+    ports:
+      - "1200:1200"
+    environment:
+      - NODE_ENV=development
+      - CACHE_TYPE=memory
+      - REQUEST_TIMEOUT=10000
+    networks:
+      - hots-network-dev
+
+networks:
+  hots-network-dev:
+    driver: bridge
