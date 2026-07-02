@@ -30,6 +30,9 @@ jobs:
       - name: Generate Prisma client
         run: pnpm prisma:generate
 
+      - name: Build shared package
+        run: pnpm --filter @hots-monitor/shared build
+
       - name: Lint
         run: pnpm lint
 
