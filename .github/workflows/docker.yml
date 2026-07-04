@@ -57,6 +57,7 @@ jobs:
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.file }}
+          build-args: ${{ matrix.image == 'web' && format('VITE_API_BASE_URL={0}', vars.VITE_API_BASE_URL) || '' }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
