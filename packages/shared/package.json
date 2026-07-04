@@ -8,6 +8,7 @@
     "zod": "^3.25.0"
   },
   "scripts": {
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run --passWithNoTests",
     "lint": "tsc --noEmit",

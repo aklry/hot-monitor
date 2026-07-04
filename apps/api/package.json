@@ -3,11 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "pnpm --filter @hots-monitor/shared build",
     "dev": "nest start --watch",
+    "prebuild": "pnpm --filter @hots-monitor/shared build",
     "build": "nest build",
+    "prestart": "pnpm --filter @hots-monitor/shared build",
     "start": "node dist/main.js",
+    "pretest": "pnpm --filter @hots-monitor/shared build",
     "test": "jest --runInBand",
+    "prelint": "pnpm --filter @hots-monitor/shared build",
     "lint": "tsc --noEmit",
+    "pretypecheck": "pnpm --filter @hots-monitor/shared build",
     "typecheck": "tsc --noEmit",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
