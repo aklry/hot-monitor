@@ -1,0 +1,22 @@
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    image: hots-monitor-api:latest
+    container_name: hots-monitor-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${API_PORT:-4000}:4000"
+    volumes:
+      - hots-api-data:/app/data
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: file:/app/data/prod.db
+      API_PORT: 4000
+
+volumes:
+  hots-api-data:
+    driver: local
