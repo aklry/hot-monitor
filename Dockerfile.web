@@ -21,9 +21,6 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-# Generate Prisma (needed for shared types resolution)
-RUN pnpm prisma:generate
-
 # Build shared and web
 RUN pnpm --filter @hots-monitor/shared build
 RUN pnpm --filter @hots-monitor/web build
