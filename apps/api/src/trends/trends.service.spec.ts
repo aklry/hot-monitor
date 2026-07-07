@@ -198,4 +198,194 @@ describe("TrendsService", () => {
       })
     })
   })
+
+  it("records AI-selected evidence even when it is outside the first ten candidates", async () => {
+    const xUrl = "https://x.com/i/web/status/123"
+    const candidates = [
+      ...Array.from({ length: 10 }, (_, index) => ({
+        sourceName: "GitHub Trending",
+        sourceType: "github_trending",
+        externalId: `github-${index}`,
+        title: `Repository ${index}`,
+        url: `https://github.com/example/repo-${index}`,
+        summary: "A repository related to agent skills.",
+        publishedAt: "2026-06-24T10:00:00.000Z"
+      })),
+      {
+        sourceName: "X",
+        sourceType: "x",
+        externalId: "x-item",
+        title: "Developers are discussing agent skills on X",
+        url: xUrl,
+        summary: "A social post points to the same emerging trend.",
+        publishedAt: "2026-06-24T10:30:00.000Z"
+      }
+    ]
+    const existingTrend = {
+      id: "trend-1",
+      scope: "ai programming",
+      title: "Agent skills reshape developer workflows",
+      summary: "Developers are adopting reusable agent skills.",
+      hotScore: 60,
+      growthScore: 20,
+      evidenceCount: 10,
+      firstSeenAt: new Date("2026-06-22T08:00:00.000Z"),
+      lastSeenAt: new Date("2026-06-23T08:00:00.000Z"),
+      createdAt: new Date("2026-06-22T08:00:00.000Z")
+    }
+    const prisma = {
+      aiAnalysis: { create: jest.fn() },
+      collectedItem: {
+        upsert: jest.fn(async ({ create }) => ({
+          id: create.externalId,
+          url: create.url,
+          publishedAt: create.publishedAt,
+          fetchedAt: create.publishedAt
+        }))
+      },
+      trendTopic: {
+        create: jest.fn(),
+        findMany: jest.fn().mockResolvedValue([existingTrend]),
+        findUnique: jest.fn(),
+        update: jest.fn().mockResolvedValue({ ...existingTrend, evidenceCount: 11 })
+      },
+      trendSnapshot: { create: jest.fn() },
+      trendEvidence: { count: jest.fn().mockResolvedValue(11), upsert: jest.fn() }
+    }
+    const sources = {
+      searchAll: jest.fn().mockResolvedValue(candidates)
+    }
+    const trendAnalysis = {
+      analyzeTrend: jest.fn().mockResolvedValue({
+        analysis: {
+          title: "Agent skills reshape developer workflows",
+          summary: "Developers are adopting reusable agent skills.",
+          hotScore: 95,
+          growthScore: 61,
+          whyNow: "Fresh coverage and social discussion point to the same trend.",
+          evidence: [
+            {
+              itemUrl: xUrl,
+              reason: "The X post confirms real-time social discussion."
+            }
+          ]
+        },
+        usage: { promptTokens: 200, completionTokens: 100, totalTokens: 300 }
+      })
+    }
+    const service = new TrendsService(prisma as never, sources as never, trendAnalysis as never)
+
+    await service.runNow("ai programming", now)
+
+    expect(prisma.trendEvidence.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          trendTopicId_itemId: {
+            trendTopicId: existingTrend.id,
+            itemId: "x-item"
+          }
+        },
+        create: expect.objectContaining({
+          trendTopicId: existingTrend.id,
+          itemId: "x-item",
+          aiReason: "The X post confirms real-time social discussion."
+        })
+      })
+    )
+  })
+
+  it("keeps evidence from scanned sources that AI did not select explicitly", async () => {
+    const xUrl = "https://x.com/i/web/status/456"
+    const candidates = [
+      ...Array.from({ length: 10 }, (_, index) => ({
+        sourceName: "GitHub Trending",
+        sourceType: "github_trending",
+        externalId: `github-${index}`,
+        title: `Repository ${index}`,
+        url: `https://github.com/example/source-repo-${index}`,
+        summary: "A repository related to agent skills.",
+        publishedAt: "2026-06-24T10:00:00.000Z"
+      })),
+      {
+        sourceName: "X",
+        sourceType: "x",
+        externalId: "x-item",
+        title: "AI programming discussion on X",
+        url: xUrl,
+        summary: "A social post from X related to AI programming.",
+        publishedAt: "2026-06-24T10:30:00.000Z"
+      }
+    ]
+    const existingTrend = {
+      id: "trend-1",
+      scope: "ai programming",
+      title: "Agent skills reshape developer workflows",
+      summary: "Developers are adopting reusable agent skills.",
+      hotScore: 60,
+      growthScore: 20,
+      evidenceCount: 10,
+      firstSeenAt: new Date("2026-06-22T08:00:00.000Z"),
+      lastSeenAt: new Date("2026-06-23T08:00:00.000Z"),
+      createdAt: new Date("2026-06-22T08:00:00.000Z")
+    }
+    const prisma = {
+      aiAnalysis: { create: jest.fn() },
+      collectedItem: {
+        upsert: jest.fn(async ({ create }) => ({
+          id: create.externalId,
+          url: create.url,
+          publishedAt: create.publishedAt,
+          fetchedAt: create.publishedAt
+        }))
+      },
+      trendTopic: {
+        create: jest.fn(),
+        findMany: jest.fn().mockResolvedValue([existingTrend]),
+        findUnique: jest.fn(),
+        update: jest.fn().mockResolvedValue({ ...existingTrend, evidenceCount: 11 })
+      },
+      trendSnapshot: { create: jest.fn() },
+      trendEvidence: { count: jest.fn().mockResolvedValue(11), upsert: jest.fn() }
+    }
+    const sources = {
+      searchAll: jest.fn().mockResolvedValue(candidates)
+    }
+    const trendAnalysis = {
+      analyzeTrend: jest.fn().mockResolvedValue({
+        analysis: {
+          title: "Agent skills reshape developer workflows",
+          summary: "Developers are adopting reusable agent skills.",
+          hotScore: 95,
+          growthScore: 61,
+          whyNow: "Fresh coverage and social discussion point to the same trend.",
+          evidence: [
+            {
+              itemUrl: "https://github.com/example/source-repo-0",
+              reason: "The GitHub repository is a strong direct signal."
+            }
+          ]
+        },
+        usage: { promptTokens: 200, completionTokens: 100, totalTokens: 300 }
+      })
+    }
+    const service = new TrendsService(prisma as never, sources as never, trendAnalysis as never)
+
+    await service.runNow("ai programming", now)
+
+    expect(prisma.trendEvidence.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          trendTopicId_itemId: {
+            trendTopicId: existingTrend.id,
+            itemId: "x-item"
+          }
+        },
+        create: expect.objectContaining({
+          trendTopicId: existingTrend.id,
+          itemId: "x-item",
+          aiReason: "Fresh coverage and social discussion point to the same trend."
+        })
+      })
+    )
+  })
 })

@@ -90,7 +90,11 @@ export class TrendsService {
           publishedAt: candidate.publishedAt ? new Date(candidate.publishedAt) : undefined
         }
       })
-      items.push(item)
+      items.push({
+        ...item,
+        sourceName: candidate.sourceName,
+        sourceType: candidate.sourceType
+      })
     }
 
     const newest = items.reduce<Date>((acc, item) => {
@@ -112,13 +116,7 @@ export class TrendsService {
       take: 50
     })
     const matchingTrend = findMatchingTrend(existingTrends, analysis.title)
-    const evidenceRows = items.slice(0, 10).map((item) => ({
-      itemId: item.id,
-      sourceWeight: 50,
-      aiReason:
-        analysis.evidence.find((evidence) => evidence.itemUrl === item.url)?.reason ??
-        analysis.whyNow
-    }))
+    const evidenceRows = this.buildEvidenceRows(items, analysis.evidence, analysis.whyNow)
 
     await this.prisma.aiAnalysis.create({
       data: {
@@ -236,6 +234,78 @@ export class TrendsService {
         capturedAt
       }
     })
+  }
+
+  private buildEvidenceRows(
+    items: Array<{
+      id: string
+      url: string
+      sourceName?: string | null
+      sourceType?: string | null
+    }>,
+    evidence: Array<{ itemUrl: string; reason: string }>,
+    fallbackReason: string
+  ) {
+    const itemsByUrl = new Map(items.map((item) => [item.url, item]))
+    const rows: Array<{ itemId: string; sourceWeight: number; aiReason: string }> = []
+    const seenItemIds = new Set<string>()
+    const seenSourceKeys = new Set<string>()
+
+    for (const entry of evidence) {
+      const item = itemsByUrl.get(entry.itemUrl)
+      if (!item || seenItemIds.has(item.id)) {
+        continue
+      }
+
+      rows.push({
+        itemId: item.id,
+        sourceWeight: 50,
+        aiReason: entry.reason
+      })
+      seenItemIds.add(item.id)
+      seenSourceKeys.add(this.evidenceSourceKey(item))
+    }
+
+    for (const item of items) {
+      const sourceKey = this.evidenceSourceKey(item)
+      if (seenItemIds.has(item.id) || seenSourceKeys.has(sourceKey)) {
+        continue
+      }
+
+      rows.push({
+        itemId: item.id,
+        sourceWeight: 50,
+        aiReason: fallbackReason
+      })
+      seenItemIds.add(item.id)
+      seenSourceKeys.add(sourceKey)
+    }
+
+    for (const item of items) {
+      if (rows.length >= 10) {
+        break
+      }
+      if (seenItemIds.has(item.id)) {
+        continue
+      }
+
+      rows.push({
+        itemId: item.id,
+        sourceWeight: 50,
+        aiReason: fallbackReason
+      })
+      seenItemIds.add(item.id)
+    }
+
+    return rows
+  }
+
+  private evidenceSourceKey(item: {
+    id: string
+    sourceName?: string | null
+    sourceType?: string | null
+  }) {
+    return `${item.sourceType ?? "unknown"}:${item.sourceName ?? item.id}`
   }
 
   private async upsertEvidenceRows(
