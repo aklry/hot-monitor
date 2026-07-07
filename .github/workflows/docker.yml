@@ -8,26 +8,15 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  API_IMAGE: ${{ github.repository_owner }}/hots-monitor-api
   WEB_IMAGE: ${{ github.repository_owner }}/hots-monitor-web
 
 jobs:
   build:
-    name: Build & Push Docker Images
+    name: Build & Push Web Docker Image
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-
-    strategy:
-      matrix:
-        include:
-          - context: .
-            file: ./Dockerfile
-            image: api
-          - context: .
-            file: ./Dockerfile.web
-            image: web
 
     steps:
       - name: Checkout
@@ -44,7 +33,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ matrix.image == 'api' && env.API_IMAGE || env.WEB_IMAGE }}
+          images: ${{ env.REGISTRY }}/${{ env.WEB_IMAGE }}
           tags: |
             type=ref,event=branch
             type=sha,prefix=
@@ -55,9 +44,9 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.context }}
-          file: ${{ matrix.file }}
-          build-args: ${{ matrix.image == 'web' && format('VITE_API_BASE_URL={0}', vars.VITE_API_BASE_URL) || '' }}
+          context: .
+          file: ./Dockerfile.web
+          build-args: VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL || 'http://localhost:4000' }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
