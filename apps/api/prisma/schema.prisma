@@ -68,25 +68,25 @@ model CollectedItem {
 }
 
 model AiAnalysis {
-  id              String          @id @default(cuid())
-  itemId          String
-  item            CollectedItem   @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  keywordId       String?
-  keyword         MonitorKeyword? @relation(fields: [keywordId], references: [id], onDelete: SetNull)
-  taskType        String
-  model           String
-  isRelevant      Boolean         @default(false)
-  isImpersonation Boolean         @default(false)
-  confidence      Float           @default(0)
-  hotScore        Float?
-  riskLevel       String          @default("low")
-  topic           String?
-  reason          String
-  rawJson         String
-  promptTokens    Int             @default(0)
-  completionTokens Int            @default(0)
-  totalTokens     Int             @default(0)
-  createdAt       DateTime        @default(now())
+  id               String          @id @default(cuid())
+  itemId           String
+  item             CollectedItem   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  keywordId        String?
+  keyword          MonitorKeyword? @relation(fields: [keywordId], references: [id], onDelete: SetNull)
+  taskType         String
+  model            String
+  isRelevant       Boolean         @default(false)
+  isImpersonation  Boolean         @default(false)
+  confidence       Float           @default(0)
+  hotScore         Float?
+  riskLevel        String          @default("low")
+  topic            String?
+  reason           String
+  rawJson          String
+  promptTokens     Int             @default(0)
+  completionTokens Int             @default(0)
+  totalTokens      Int             @default(0)
+  createdAt        DateTime        @default(now())
 
   @@index([taskType])
   @@index([keywordId])

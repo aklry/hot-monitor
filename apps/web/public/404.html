@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -8,8 +8,8 @@
       // When a user navigates directly to a client-side route like /hot-monitor/monitors,
       // GitHub Pages returns this 404 page. We redirect to index.html with the path
       // stored as a query parameter so the SPA can restore the correct route.
-      var pathSegmentsToKeep = 1; // keep "/hot-monitor" segment
-      var l = window.location;
+      var pathSegmentsToKeep = 1 // keep "/hot-monitor" segment
+      var l = window.location
       l.replace(
         l.protocol +
           "//" +
@@ -28,7 +28,7 @@
             .replace(/&/g, "~and~") +
           (l.search ? "&" + l.search.slice(1).replace(/&/g, "~and~") : "") +
           l.hash
-      );
+      )
     </script>
   </head>
   <body></body>

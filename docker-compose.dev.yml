@@ -1,7 +1,7 @@
 # Development Docker Compose
 # Use this for local development with hot-reload
 
-version: '3.8'
+version: "3.8"
 
 services:
   rsshub:

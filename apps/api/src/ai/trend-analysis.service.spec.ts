@@ -39,7 +39,8 @@ describe("TrendAnalysisService", () => {
     expect(client.completeJson).toHaveBeenCalledWith(
       expect.stringContaining("evidence 字段必须是对象数组"),
       {
-        strict: true }
+        strict: true
+      }
     )
   })
 })

@@ -115,7 +115,9 @@ export function SettingsPage() {
                   <Activity size={14} />
                   <span>Today's Usage</span>
                 </div>
-                <span className="usage-total">{dailyUsage.totalTokens.toLocaleString()} tokens</span>
+                <span className="usage-total">
+                  {dailyUsage.totalTokens.toLocaleString()} tokens
+                </span>
               </div>
               {dailyBudget > 0 && (
                 <div className="usage-bar-track">
@@ -132,11 +134,15 @@ export function SettingsPage() {
                   <span className="usage-stat-label">requests</span>
                 </div>
                 <div className="usage-stat">
-                  <span className="usage-stat-value">{dailyUsage.promptTokens.toLocaleString()}</span>
+                  <span className="usage-stat-value">
+                    {dailyUsage.promptTokens.toLocaleString()}
+                  </span>
                   <span className="usage-stat-label">prompt</span>
                 </div>
                 <div className="usage-stat">
-                  <span className="usage-stat-value">{dailyUsage.completionTokens.toLocaleString()}</span>
+                  <span className="usage-stat-value">
+                    {dailyUsage.completionTokens.toLocaleString()}
+                  </span>
                   <span className="usage-stat-label">completion</span>
                 </div>
                 {dailyBudget > 0 && (
@@ -159,7 +165,11 @@ export function SettingsPage() {
             </div>
           </div>
           <div className="settings-actions">
-            <button type="button" className="secondary-action" onClick={requestBrowserNotificationPermission}>
+            <button
+              type="button"
+              className="secondary-action"
+              onClick={requestBrowserNotificationPermission}
+            >
               Enable Browser Notifications
             </button>
           </div>

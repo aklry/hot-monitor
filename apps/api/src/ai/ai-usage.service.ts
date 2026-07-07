@@ -43,11 +43,7 @@ export class AiUsageService {
     return usage.totalTokens < budget
   }
 
-  async recordUsage(data: {
-    promptTokens: number
-    completionTokens: number
-    totalTokens: number
-  }) {
+  async recordUsage(data: { promptTokens: number; completionTokens: number; totalTokens: number }) {
     this.logger.debug(
       `AI usage: ${data.totalTokens} tokens (${data.promptTokens} prompt + ${data.completionTokens} completion)`
     )
